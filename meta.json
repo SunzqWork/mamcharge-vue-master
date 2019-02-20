@@ -14,6 +14,12 @@
         "author": {
             "type": "string",
             "label": "Author"
+        },
+        "port": {
+            "type": "number",
+            "required": true,
+            "label": "Project port",
+            "default": "9257"
         }
     },
     "skipInterpolation": ["lib/ace/src/**/*.js", "lib/ace/**/*.js", "static/tinymce4.7.5/*.js", "static/tinymce4.7.5/**/*.js", "**/*.vue"],
