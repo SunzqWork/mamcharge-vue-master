@@ -1,0 +1,32 @@
+@import './theme.scss';
+
+.width-300px {
+  width: 300px;
+}
+
+.mb10{
+  margin-bottom: 10px;
+}
+
+.p10{
+  padding: 10px;
+}
+
+.icon-caveat{
+  color: orange;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.zl-block-center{
+  display: table;
+  margin: 0 auto;
+}
+
+.color{
+  color: $themeColor;
+}
+
+.zl-height-450{
+  height: 450px;
+}

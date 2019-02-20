@@ -1,0 +1,173 @@
+@import './transition.scss';
+@import '@/styles/theme.scss';
+
+label {
+  font-weight: 500;
+}
+
+/* 滚动条 */
+.scrollbar-wrapper {
+  overflow-x: hidden!important;
+  .el-scrollbar__view {
+    height: 100%;
+  }
+}
+
+.zl-input-180px{
+  width: 180px;
+  height: 36px !important;
+  .el-input__inner{
+    height: 36px;
+    line-height: 36px;
+  }
+}
+
+.zl-tabs{
+  height: 50px;
+  border-bottom: 1px solid #e5e5e5;
+  display: flex;
+  justify-content: flex-start;
+  .zl-tabs-btn{
+    height: 100%;
+    padding: 0 8px;
+    line-height: 60px;
+    margin-left: 15px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #999999;
+  }
+  .zl-tabs-btn-active{
+    font-size: 14px;
+    color: #666666;
+    font-weight: 700;
+    border-bottom: 3px solid $themeColor;
+  }
+}
+
+/**返回icon**/
+.icon-back{
+  font-size: 28px !important;
+  color: #909399;
+}
+
+/** 修改表单label **/
+.el-form-item__label{
+  font-size: 14px;
+  font-weight: 500;
+  color: #333 !important;
+}
+.el-radio__label{
+  font-size: 14px;
+  color: #666;
+  font-weight: 400;
+}
+.el-date-editor .el-range-separator{
+  padding: 0 !important;
+}
+/**搜索的label**/
+.search-label{
+  font-size: 14px;
+  color: #333 !important;
+}
+
+// 页面margin
+.page-margin{
+  margin: 20px;
+}
+/**自定义表单样式**/
+.form-groups{
+  .form-item{
+    margin-bottom: 15px;
+    .label{
+      margin-right: 15px;
+      line-height: 36px;
+      text-align: right;
+      width: 120px;
+      height: 36px;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      color: #333 !important;
+    }
+  }
+}
+
+/**表单必选**/
+.required-class{
+  .el-form-item__label{
+    &::before {
+      content: '*';
+      color: #f56c6c;
+      margin-right: 4px;
+    }
+  }
+  .label{
+    &::before {
+      content: '*';
+      color: #f56c6c;
+      margin-right: 4px;
+    }
+  }
+}
+.btn-70px{
+  width: 70px;
+  height: 32px;
+  padding: 0;
+}
+.zl-select-136px{
+  width: 136px;
+}
+.zl-input-220px{
+  width: 220px;
+}
+.zl-select-210px{
+  width: 210px;
+}
+.zl-secreen{
+  margin: 15px 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px dotted #e5e5e5;
+}
+.zl-query-btn{
+  background: $themeColor;
+}
+
+
+/**覆盖**/
+.el-input-group__prepend{
+  width: 100px !important;
+}
+.ellipsis{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+
+.form-item-value{
+  color: #999;
+}
+.org-form{
+  .el-form-item{
+    margin-bottom: 0;
+  }
+}
+
+.org-table{
+   th > .cell {
+    position: relative;
+    word-wrap: normal;
+    text-overflow: ellipsis;
+    display: inline-block;
+    vertical-align: middle;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    color: #333;
+    font-weight: 400;
+  }
+}
+
+.org-tab {
+  background: #fff;
+  border: 1px solid #dcdfe6;
+  box-shadow: none;
+}
