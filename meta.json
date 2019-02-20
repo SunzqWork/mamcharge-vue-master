@@ -20,5 +20,6 @@
             "default": true
         }
     },
+    "skipInterpolation": ["**/*.js", "**/*.vue"],
     "completeMessage": "To get started:\n\n  cd {{destDirName}}\n  npm install\n dev: npm run dev\n build: npm run build dev:build:  npm run dev:build"
 }
