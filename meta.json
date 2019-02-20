@@ -14,10 +14,6 @@
         "author": {
             "type": "string",
             "label": "Author"
-        },
-        "private": {
-            "type": "boolean",
-            "default": true
         }
     },
     "skipInterpolation": ["lib/ace/src/**/*.js", "lib/ace/**/*.js", "static/tinymce4.7.5/*.js", "static/tinymce4.7.5/**/*.js", "**/*.vue"],

@@ -1,8 +1,8 @@
 {
-    "name": "D_WebUI",
+    "name": "{{name}}",
     "version": "1.0.0",
-    "description": "统一系统框架",
-    "author": "孙正强",
+    "description": "{{description}}",
+    "author": "{{author}}",
     "license": "MIT",
     "scripts": {
         "dev": "cross-env BABEL_ENV=development webpack-dev-server --inline --progress --config build/webpack.dev.conf.js --env dev",
