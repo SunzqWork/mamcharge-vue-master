@@ -1,9 +1,35 @@
 'use strict'
+const fs = require('fs')
 const path = require('path')
 const utils = require('./utils')
 const config = require('../config')
 const { VueLoaderPlugin } = require('vue-loader')
 const vueLoaderConfig = require('./vue-loader.conf')
+
+//打包前准备
+function copyFolder(from, to) { // 复制文件夹到指定目录
+
+    // process.stdout.write(`${to}\n\n\n`);
+    let files = [];
+    if (fs.existsSync(to)) { // 文件是否存在 如果不存在则创建
+        files = fs.readdirSync(from);
+        files.forEach(function(file, index) {
+            var targetPath = from + "/" + file;
+            var toPath = to + '/' + file;
+            if (fs.statSync(targetPath).isDirectory()) { // 复制文件夹
+                copyFolder(targetPath, toPath);
+            } else { // 拷贝文件
+                if (file.indexOf('package.json') < 0) {
+                    fs.copyFileSync(targetPath, toPath);
+                }
+            }
+        });
+    } else {
+        fs.mkdirSync(to);
+        copyFolder(from, to);
+    }
+}
+copyFolder('node_modules/mamcharge-vue-frame', '.')
 
 function resolve(dir) {
     return path.join(__dirname, '..', dir)

@@ -50,6 +50,7 @@
         "jsonlint": "1.6.3",
         "jszip": "3.1.5",
         "lodash": "^4.17.11",
+        "mamcharge-vue-frame": "^1.0.0",
         "mockjs": "1.0.1-beta3",
         "moment": "^2.23.0",
         "normalize.css": "7.0.0",
