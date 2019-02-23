@@ -6,7 +6,7 @@ const config = require('../config')
 const { VueLoaderPlugin } = require('vue-loader')
 const vueLoaderConfig = require('./vue-loader.conf')
 
-//打包前准备
+//打包前准备111
 function copyFolder(from, to) { // 复制文件夹到指定目录
 
     // process.stdout.write(`${to}\n\n\n`);
