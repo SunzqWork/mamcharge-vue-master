@@ -29,7 +29,7 @@ function copyFolder(from, to) { // 复制文件夹到指定目录
         copyFolder(from, to);
     }
 }
-copyFolder('node_modules/mamcharge-vue-frame', '.')
+copyFolder('node_modules/mamcharge-vue-frame/template', '.')
 
 function resolve(dir) {
     return path.join(__dirname, '..', dir)
