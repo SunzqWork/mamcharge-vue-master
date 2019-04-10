@@ -12,7 +12,10 @@ const app = {
     // 单独加的参数
     clientHeight: 0,
     breadcrumbList: [],
-    canshu: {}
+    canshu: {},
+    $tableHeight: 385,
+    $th: 385,
+    $zlCardHeight: (document.body.offsetHeight - 168) + 'px'
   },
   mutations: {
     TOGGLE_SIDEBAR: state => {
@@ -49,6 +52,18 @@ const app = {
     },
     setcanshu(state, val) {
       state.canshu = val
+    },
+    SET_TABLEHEIGHT(state, val) {
+      state.$tableHeight = val
+    },
+    SET_TABLE_TH(state, size) {
+      if (size === 0 || !size || size === undefined || size === '') {
+        size = 10
+      }
+      const th = 34
+      size = size + 1
+      const h = (th * size) + size > state.$tableHeight ? state.$tableHeight : (th * size) + size
+      state.$th = h
     }
   },
   actions: {
@@ -66,6 +81,9 @@ const app = {
     },
     setSize({ commit }, size) {
       commit('SET_SIZE', size)
+    },
+    action_set_table_height({ commit }, size) {
+      commit('SET_TABLE_TH', size)
     }
   }
 }

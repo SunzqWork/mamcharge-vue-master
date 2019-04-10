@@ -17,6 +17,8 @@
         :item="route"
         :base-path="route.path"
       />
+      
+      
     </el-menu>
     <div class="mam-config">
       <template v-if="device!=='mobile' && !isCollapse">
@@ -36,7 +38,7 @@
             <svg-icon icon-class="Aa" class="mam-icons"/>
           </div>
         </el-tooltip>
-        <el-tooltip content="注销登陆" effect="dark" placement="bottom">
+        <el-tooltip content="注销登录" effect="dark" placement="bottom">
           <div class="mam-config-page">
             <svg-icon icon-class="power" class="mam-icons"/>
           </div>
@@ -104,10 +106,7 @@ export default {
   methods: {
     themeColor(color) {
       // this.theme = color;
-      // console.log(
-      //   document.getElementsByClassName("router-link-exact-active")[0]
-      //     .children[0]
-      // );
+      
       document
         .getElementsByClassName("router-link-exact-active")[0]
         .children[0].setAttribute(

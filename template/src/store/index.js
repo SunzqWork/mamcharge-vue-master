@@ -12,25 +12,27 @@ import components from './modules/components'
 import vendor from './modules/vendor'
 import org from './modules/organization'
 import job from './modules/job'
+import catchs from './modules/catchs'
 
 
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
-    modules: {
-        app,
-        errorLog,
-        tagsView,
-        user,
-        components,
-        premissionCenter,
-        tree,
-        cache,
-        vendor,
-        org,
-        job
-    },
-    getters
+  modules: {
+    app,
+    errorLog,
+    tagsView,
+    user,
+    components,
+    premissionCenter,
+    tree,
+    cache,
+    vendor,
+    org,
+    job,
+    catchs
+  },
+  getters
 })
 
 export default store

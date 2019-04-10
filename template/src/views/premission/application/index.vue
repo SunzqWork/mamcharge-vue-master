@@ -1,34 +1,36 @@
 <template>
   <div id="application">
-    <zl-card>
-      <el-input class="zl-input-220px zl-form-control" placeholder="搜索名称" v-model="name"></el-input>
-      <el-button class="btn-theme" @click="search(1)" icon="el-icon-search">查询</el-button>
+    <zl-card style="overflow:hidden;">
+      <el-input style="float:left;" class="zl-input-240px zl-form-control" placeholder="应用名称" v-model="name" @change="reapl" @keyup.enter.native="search(1)"></el-input>
+      <el-button style="float:left;margin-left: 5px;" class="btn-theme" @click="search(1)" >查询</el-button>
     </zl-card>
     <zl-card>
       <el-row class="mb10">
-        <el-button icon="el-icon-plus" class="btn-theme" @click="addApplicaition">新增应用</el-button>
+        <el-button  class="btn-theme" @click="addApplicaition" v-if="btnPermission('addApp')">新增</el-button>
+        <el-button  class="btn-default" @click="editApp(false, '编辑应用')">编辑</el-button>
+        <!-- <el-button  class="btn-default" @click="editApp(true, '查看应用')">查看</el-button> -->
+        <el-button  class="btn-default" @click="deleteApp">删除</el-button>
       </el-row>
-      <el-table
-        :data="tableData"
-        class="zl-table"
-        stripe
-        >
-        <el-table-column align="left" prop="id" label="id" width="300"></el-table-column>
-        <el-table-column align="left" prop="name" label="名称"></el-table-column>
-        <el-table-column align="left" prop="url" label="站点URL"></el-table-column>
-        <el-table-column align="left" prop="createUser" label="创建人" width="100px"></el-table-column>
-        <el-table-column align="left" prop="createTime" label="创建时间"></el-table-column>
-        <el-table-column align="left" prop="updateUser" label="修改人" width="100px"></el-table-column>
-        <el-table-column align="left" prop="updateTime" label="修改时间"></el-table-column>
-        <el-table-column align="left" label="操作" fixed="right" width="180px">
-          <template slot-scope="scope">
-            <span class="icon-theme" @click="editApplication(scope.row.id)">编辑</span>
-            <i class="zl-icon-line"></i>
-            <span class="icon-theme" @click="delBtn(scope.row.id)">删除</span>
-          </template>
-        </el-table-column>
+      <el-table 
+        :data="tableData" 
+        class="zl-table" 
+        stripe 
+        border
+        :height="tableHeight" 
+        highlight-current-row 
+        @current-change="handleCurrentChange">
+        <!-- <el-table-column
+          type="selection"
+          width="55">
+        </el-table-column> -->
+        <el-table-column align="left" prop="id" label="id" width="300" :show-overflow-tooltip="true" header-align="center"></el-table-column>
+        <el-table-column align="left" prop="name" label="名称" :show-overflow-tooltip="true" header-align="center"></el-table-column>
+        <el-table-column align="left" prop="url" label="站点URL" :show-overflow-tooltip="true" header-align="center"></el-table-column>
+        <el-table-column align="left" prop="createUser" label="创建人" width="100px" header-align="center"></el-table-column>
+        <el-table-column align="center" prop="createTime" label="创建时间" :show-overflow-tooltip="true" header-align="center"></el-table-column>
+        <!-- <el-table-column align="left" prop="updateUser" label="修改人" width="100px" header-align="center"></el-table-column> -->
+        <el-table-column align="center" prop="updateTime" label="修改时间" :show-overflow-tooltip="true" header-align="center"></el-table-column>
       </el-table>
-    </zl-card>
     <el-pagination
       background
       class="zl-pagination"
@@ -39,10 +41,17 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
     </el-pagination>
+    </zl-card>
 
     <applicaitionDialog :isShow.sync="isShow" title="新增应用" @is-submit="addFunction" v-if="isShow"/>
 
-    <applicaitionDialog :isShow.sync="isShowEdit" title="编辑应用" @is-submit="editFunction" v-if="isShowEdit" :data="appInfo"/>
+    <applicaitionDialog 
+      :isShow.sync="isShowEdit" 
+      :title="title" 
+      @is-submit="editFunction" 
+      v-if="isShowEdit"
+      :isDisabled="isDisabled" 
+      :data="appInfo"/>
   </div>
 </template>
 <script>
@@ -57,7 +66,7 @@ export default {
     return {
       listParams: {
         page: 1,
-        size: 30
+        size: 10
       },
       name: '',
       id: '',
@@ -65,10 +74,69 @@ export default {
       total: 0,
       isShow: false,
       isShowEdit: false,
-      appInfo: {}
+      appInfo: {},
+      isDisabled: false,
+      title: '编辑应用'
+    }
+  },
+  computed: {
+    tableHeight() {
+      return this.$store.state.app.$th
+    }
+  },
+  watch: {
+    tableData(data) {
+      this.$store.dispatch('action_set_table_height', data.length)
     }
   },
   methods: {
+    reapl(){
+      this.name = this.name.replace(/\s+/g,"")
+    },
+    // 行被点击
+    handleCurrentChange(currentRow, oldCurrentRow) {
+      this.appInfo = currentRow
+    },
+
+    editApp(flag, title) {
+     if(this.appInfo == null){
+        return this.$message.warning('请先选择应用')
+     }else{
+      if(this.appInfo.id == undefined){
+        return this.$message.warning('请先选择应用')
+      }
+     }
+       
+      this.title = title
+      if (this.appInfo.id) {
+        this.isShowEdit = true
+        this.isDisabled = flag
+      } else {
+        if (flag) {
+          this.$message({
+            type: 'warning',
+            message: '请选择要查看的应用'
+          })
+        } else {
+          this.$message({
+            type: 'warning',
+            message: '请选择要编辑的应用'
+          })
+        }
+      }
+    },
+
+    deleteApp() {
+      if (this.appInfo) {
+        this.delBtn(this.appInfo.id)
+      } else {
+        this.$message({
+          type: 'warning',
+          message: '请选择要删除的应用'
+        })
+      }
+    },
+
     addApplicaition() {
       this.isShow = true
     },
@@ -82,21 +150,24 @@ export default {
           this.$message.error('获取子系统信息失败，请联系管理员。')
         }
       }).catch(err => {
-        console.log(err)
       })
     },
     // 添加应用
     addFunction(data) {
+      if (data.hidden) {
+        data.hidden = 1
+      } else {
+        data.hidden = 0
+      }
       addFunction(data).then(res => {
         if (res.success) {
-          this.$message.success('新建应用成功')
+          this.$message.success('新增应用成功')
           this.isShow = false
           this.getData()
         } else {
-          this.$message.error('新建应用失败，请联系管理员。')
+          this.$message.error(res.errmsg)
         }
       }).catch(err => {
-        console.log(err)
       })
     },
 
@@ -106,16 +177,20 @@ export default {
 
     // 编辑应用
     editFunction(data) {
+      if (data.hidden) {
+        data.hidden = 1
+      } else {
+        data.hidden = 0
+      }
       editFunction(data.id, data).then(res => {
         if (res.success) {
           this.$message.success('应用编辑成功')
           this.isShowEdit = false
           this.getData()
         } else {
-          this.$message.error('应用编辑失败，请联系管理员。')
+          this.$message.error(res.errmsg)
         }
       }).catch(err => {
-        console.log(err)
       })
     },
 
@@ -150,6 +225,14 @@ export default {
       this.del()
     },
     del() {
+      if(this.appInfo == null){
+        return this.$message.warning('请先选择应用')
+     }else{
+      if(this.appInfo.id == undefined){
+        return this.$message.warning('请先选择应用')
+      }
+     }
+      // if(this.appInfo)
       const str = `
         <p class="zl-confirm-html">
           <i class="el-icon-warning"></i>
@@ -162,7 +245,7 @@ export default {
         dangerouslyUseHTMLString: true,
       }).then(() => {
         delFunction(this.id).then(res => {
-          if (res.errmsg == 'success') {
+          if (res.success) {
             this.$message({
               message: '删除成功',
               type: 'success'
@@ -170,7 +253,7 @@ export default {
             this.delDialog = false;
             this.getData();
           } else {
-            this.$message.error('删除失败')
+            this.$message.error(res.errmsg)
           }
         })
       }).catch(() => {

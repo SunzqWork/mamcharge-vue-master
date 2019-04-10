@@ -16,7 +16,7 @@ export function formatData(data) {
   return data
 }
 
-// 根据搜索找到对象
+// 根据查询找到对象
 export function setData(data, selectId) {
   const loop = (obj) => {
     if (obj.children && obj.children.length > 0) {

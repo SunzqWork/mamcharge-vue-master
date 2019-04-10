@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- 已经变更过一次子集了 children -->
     <transition name="el-zoom-in-top">
       <div v-show="!dataList.sysPositionList">
         <p class="zl-none">没有数据</p>
@@ -18,7 +19,11 @@
         :label="ins.name "
         v-model="dataList.sysPositionList[index].value"
       ></el-checkbox>
-      <div v-if="!dataList.sysPositionList[index].value" @click="next(ins,index)" style="float: right;overflow: hidden;">
+      <div
+        v-if="!dataList.sysPositionList[index].value && dataList.sysPositionList[index].type != 'atom'"
+        @click="next(ins,index)"
+        style="float: right;overflow: hidden;"
+      >
         <svg-icon style="float: left;" icon-class="fenzhi" class="zl-org-icon"/>
       </div>
       <div v-else style="float: right;overflow: hidden;">
@@ -26,21 +31,22 @@
       </div>
     </div>
     <!-- 单选 -->
-
     <div
-      v-if="dataList.sysPositionList && check == 'radio' && types.includes(checkList.sysPositionList[0].type)"
+      v-if="dataList.sysPositionList && check == 'radio' && types.includes(checkList.sysPositionList[0].type) && checkList.sysPositionList[0].type == 'atom'"
       style="float: none;display: block;width: 100%;overflow:hidden;"
       v-for="(ins,index) in dataList.sysPositionList"
       :key="ins.id"
     >
       <el-radio :label="ins.id" v-model="radio" @change="radioChange">{{ins.name}}</el-radio>
-      <div @click="next(ins,index)" style="float: right;overflow: hidden;">
+      <div @click="next(ins,index)" style="float: right;overflow: hidden;"
+        v-if="!dataList.sysPositionList[index].value && dataList.sysPositionList[index].type != 'atom'"
+      >
         <svg-icon style="float: left;" icon-class="fenzhi" class="zl-org-icon"/>
       </div>
     </div>
     <!-- 只点击 -->
     <div
-      v-if="dataList.sysPositionList && types.includes(checkList.sysPositionList[0].type) == false"
+      v-if="dataList.sysPositionList && types.includes(checkList.sysPositionList[0].type) == false || (check == 'radio' && dataList.sysPositionList[0].type != 'atom') "
       style="float: none;display: block;width: 100%;overflow:hidden;cursor: pointer;"
       v-for="(ins,index) in dataList.sysPositionList"
       :key="ins.id"
@@ -76,7 +82,7 @@ export default {
   data() {
     return {
       data: [],
-      radio:"",
+      radio: "",
       dataList: this.checkList,
       clicks: false
     };
@@ -91,14 +97,19 @@ export default {
       ) {
         // 最后一级
       } else {
-        this.clicks = this.check.includes(this.checkList.sysPositionList[0].type);
+        this.clicks = this.check.includes(
+          this.checkList.sysPositionList[0].type
+        );
       }
     }
   },
   mounted() {
-       this.radio = this.checkList.radio 
+    this.radio = this.checkList.radio;
     // types
-    if (this.checkList.sysPositionList == "" || this.checkList.sysPositionList == undefined) {
+    if (
+      this.checkList.sysPositionList == "" ||
+      this.checkList.sysPositionList == undefined
+    ) {
       // 最后一级
     } else {
       this.clicks = this.types.includes(this.checkList.sysPositionList[0].type);
@@ -106,17 +117,13 @@ export default {
   },
   methods: {
     // 清空
-    cleanRadio(){
-      this.radio = ""
+    cleanRadio() {
+      this.radio = "";
     },
     // 单选触发
-    radioChange(){
-      this.checkList.radio = this.radio
-       this.$emit(
-        "check-tree",
-        this.radio
-      );
-
+    radioChange() {
+      this.checkList.radio = this.radio;
+      this.$emit("check-tree", this.radio);
     },
     //触发
     changes(info) {
@@ -134,7 +141,6 @@ export default {
         info,
         this.dataList.sysPositionList.filter(s => s.value).length
       );
-      
     },
     // 查询所有
     next(s, index) {

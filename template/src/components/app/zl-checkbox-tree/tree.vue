@@ -17,7 +17,6 @@ export default {
   },
   mounted() {
     this.$store.dispatch('SAVEMODELDATA', this.data)
-    // console.log(buildTree(treeToArray(treeData())))
   }
 }
 </script>

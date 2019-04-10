@@ -17,8 +17,8 @@ export default function treeToArray(data, expandAll, parent = null, level = null
     Vue.set(record, '_level', _level)
 
     // 复选状态控制
-    Vue.set(record, 'check', false)
-    Vue.set(record, 'indeterminate', false)
+    Vue.set(record, 'check', record.check)
+    Vue.set(record, 'indeterminate', record.indeterminate)
 
     // 如果有父元素
     if (parent) {

@@ -66,7 +66,6 @@ export default {
           this.handleCheckedChange(this.checkList)
         }
       }).catch(err => {
-        console.log(err)
       })
     }
   },

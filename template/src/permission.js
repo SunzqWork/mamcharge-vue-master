@@ -3,6 +3,7 @@ import store from './store'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import { getToken } from '@/utils/premissionAuth'
+import { getUserInfo } from '@/api/premission'
 
 NProgress.configure({ showSpinner: false })
 
@@ -15,14 +16,23 @@ router.beforeEach((to, from, next) => {
             next('/')
             NProgress.done()
         } else {
+            if (sessionStorage.getItem('userInfo') == undefined || sessionStorage.getItem('userInfo') == null) {
+                getUserInfo().then(response => {
+                    sessionStorage.setItem('userInfo', JSON.stringify(response.data))
+                    next()
+                })
+            } else {
+                next()
+            }
             if (store.getters.permission_routers.length === 0) {
-                store.dispatch('GetSysMenus', 66).then(response => {
+                store.dispatch('GetSysMenus', window.sysId).then(response => {
                     router.addRoutes(store.getters.permission_routers)
                     next({...to, replace: true })
                 })
             } else {
                 next()
             }
+
         }
     } else {
         if (whiteList.indexOf(to.path) !== -1) {

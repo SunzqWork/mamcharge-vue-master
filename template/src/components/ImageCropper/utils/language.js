@@ -10,7 +10,7 @@ export default {
       off: '取消',
       close: '关闭',
       back: '上一步',
-      save: '保存'
+      save: '确定'
     },
     error: {
       onlyImg: '仅限图片格式',
@@ -29,7 +29,7 @@ export default {
       off: '取消',
       close: '關閉',
       back: '上一步',
-      save: '保存'
+      save: '确定'
     },
     error: {
       onlyImg: '僅限圖片格式',
@@ -221,7 +221,7 @@ export default {
       off: 'キャンセル',
       close: '閉じる',
       back: '戻る',
-      save: '保存'
+      save: '确定'
     },
     error: {
       onlyImg: '画像のみ',

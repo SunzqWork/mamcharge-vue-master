@@ -106,7 +106,6 @@ export default {
           }
         }
       } else {
-        console.log('当前操作的元素父亲是祖先级别')
       }
     },
     selectParents(ele) {
@@ -130,7 +129,6 @@ export default {
           })
         }
       } else {
-        // console.log(new Error('节点不存在children属性'))
       }
     }
   }

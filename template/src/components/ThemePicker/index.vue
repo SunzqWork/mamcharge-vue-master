@@ -1,10 +1,8 @@
 <template>
   <el-color-picker
     v-model="theme"
-    size="mini"
     class="theme-picker"
-    popper-class="theme-picker-dropdown"
-    />
+    popper-class="theme-picker-dropdown"/>
 </template>
 
 <script>
@@ -13,20 +11,14 @@ const version = require('element-ui/package.json').version // element-ui version
 const ORIGINAL_THEME = '#409EFF' // default color
 
 export default {
-  props:{
-    theme:{
-      default:'#409EFF'
-    }
-  },
   data() {
     return {
       chalk: '', // content of theme-chalk css
-      // theme: ORIGINAL_THEME
+      theme: ORIGINAL_THEME
     }
   },
   watch: {
     theme(val, oldVal) {
-      this.$emit('themeColor',val);
       if (typeof val !== 'string') return
       const themeCluster = this.getThemeCluster(val.replace('#', ''))
       const originalCluster = this.getThemeCluster(oldVal.replace('#', ''))
@@ -143,15 +135,9 @@ export default {
 <style>
 .theme-picker .el-color-picker__trigger {
   vertical-align: middle;
-   display: block;
-  margin: auto;
 }
 
 .theme-picker-dropdown .el-color-dropdown__link-btn {
   display: none;
-}
-.theme-picker{
-  display: block;
-  margin: auto;
 }
 </style>

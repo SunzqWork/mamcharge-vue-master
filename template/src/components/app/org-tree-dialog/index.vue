@@ -3,17 +3,17 @@
     <el-dialog
       title="机构树"
       :visible="isShow"
-      width="450px"
+      width="300px"
       @close="close">
       <div class="container">
         <el-scrollbar wrapClass="scrollbar-wrapper" class="scroll" style="height: 480px;">
           <org-tree :data="treeData" @handleNodeClick="handleNodeClick"></org-tree>
         </el-scrollbar>
       </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button class="btn-default" @click="cancel">取 消</el-button>
+      <div slot="footer" style="text-align: center;">
         <el-button class="btn-theme" @click="submit">确 定</el-button>
-      </span>
+        <el-button class="btn-default" @click="cancel">取 消</el-button>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -70,7 +70,6 @@ export default {
           this.$message.error('获取组织架构树失败，请联系管理员。')
         }
       }).catch(err => {
-        console.log(err)
       })
     }
   }
@@ -79,7 +78,9 @@ export default {
 <style lang="scss">
 .org-tree-dialog{
   .container{
-    min-height: 500px;
+    min-height: 400px;
+    max-height: 600px;
+    overflow: auto;
   }
 }
 </style>

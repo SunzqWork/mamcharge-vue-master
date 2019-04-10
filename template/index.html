@@ -7,13 +7,16 @@
     <meta name="renderer" content="webkit">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>公共平台</title>
-</head>
-
-<body>
+    <script src="/ZL_Config.js"></script>
     <script>
         window.ary = [];
         window.loadingInstance = "close"
+        document.write(`<script src='/static/${window.location.hash.split('/')[1]}/ZL_Config.js'><\/script>`);
     </script>
+
+</head>
+
+<body>
     <script src="<%=BASE_URL %>/tinymce4.7.5/tinymce.min.js">
     </script>
     <div id="app"></div>
@@ -29,5 +32,16 @@
         }
     </style>
 </body>
+<script>
+    function isInclude(name, del) {
+        var js = /js$/i.test(name);
+        var es = document.getElementsByTagName(js ? 'script' : 'link');
+        for (var i = 0; i < es.length; i++)
+            if (es[i][js ? 'src' : 'href'].indexOf(name) != -1) return true;
+        return false;
+    }
+    if (!isInclude(`/${window.location.hash.split('/')[1]}/js/CommonRuntime.js`))
+        document.write(`<script src='/static/${window.location.hash.split('/')[1]}/js/CommonRuntime.js'><\/script>`);
+</script>
 
 </html>

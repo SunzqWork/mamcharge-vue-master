@@ -6,11 +6,11 @@
         <h4>权限中心</h4>
       </div>
       <div class="mam-self">
-        <div class="mam-search">
+        <!-- <div class="mam-search">
           <i class="el-icon-search"/>
           <input type="text">
-        </div>
-        <div class="mam-self-set">
+        </div> -->
+         <div class="mam-self-set">
           <div @click="setList">
             <svg-icon class="mam-icons" icon-class="apply"/>
           </div>
@@ -19,65 +19,22 @@
             <div class="mam-contentList">
               <i class="el-icon-caret-top"/>
               <ul>
-                <li>
+                <li v-for="Appinfo in Applist" :title="Appinfo.name" @click="skipApp(Appinfo.id,Appinfo.name)">
                   <icon class="mam-iconApp" name="chart-area"/>
-                  <p>系统标题</p>
-                </li>
-                <li>
-                  <icon class="mam-iconApp" name="chart-area"/>
-                  <p>系统标题</p>
-                </li>
-                <li>
-                  <icon class="mam-iconApp" name="chart-area"/>
-                  <p>系统标题</p>
-                </li>
-                <li>
-                  <icon class="mam-iconApp" name="chart-area"/>
-                  <p>系统标题</p>
-                </li>
-                <li>
-                  <icon class="mam-iconApp" name="chart-area"/>
-                  <p>系统标题</p>
-                </li>
-                <li>
-                  <icon class="mam-iconApp" name="chart-area"/>
-                  <p>系统标题</p>
-                </li>
-                <li>
-                  <icon class="mam-iconApp" name="chart-area"/>
-                  <p>系统标题</p>
-                </li>
-                <li>
-                  <icon class="mam-iconApp" name="chart-area"/>
-                  <p>系统标题</p>
-                </li>
-                <li>
-                  <icon class="mam-iconApp" name="chart-area"/>
-                  <p>系统标题</p>
-                </li>
-                <li>
-                  <icon class="mam-iconApp" name="chart-area"/>
-                  <p>系统标题</p>
-                </li>
-                <li>
-                  <icon class="mam-iconApp" name="chart-area"/>
-                  <p>系统标题</p>
-                </li>
-                <li>
-                  <icon class="mam-iconApp" name="chart-area"/>
-                  <p>系统标题</p>
+                  <p class="mam-Applist">{{Appinfo.name}}</p>
                 </li>
               </ul>
             </div>
           </div>
         </div>
         <div class="mam-self-set"  @click="clicsk">
-          <!-- <el-badge :value="12" class="item"> -->
+          <!--<el-badge :value="12" class="item">
+          </el-badge>-->
           <svg-icon class="mam-icons" icon-class="full"/>
-          <!-- </el-badge> -->
+          
         </div>
 
-        <div class="mam-self-set">
+        <!-- <div class="mam-self-set">
           <div @click="setOpen">
             <svg-icon class="mam-icons" icon-class="msg" style="font-size: 35px;margin-top: 6px;"/>
           </div>
@@ -111,35 +68,25 @@
             </div>
             <div class="mam-more">查看全部消息</div>
           </div>
-        </div>
+        </div> -->
         <div class="mam-self-msg">
           <div style="float:left;position: relative;">
-            <img src="@/assets/header.png" alt @click="opens">
+            <img :src="headerImg" alt @click="opens">
             <div v-if="setting" class="mam-settingSelf">
               <i class="el-icon-caret-top"/>
               <ul>
                 <li>
-                  <icon class="mam-ic" name="user-alt"/>
-                  <b>个人中心</b>
+                  <b @click="isShow = true">个人中心</b>
                 </li>
-                <!-- <li>
-                  <icon class="mam-ic" name="cogs"/>
-                  <b>设置</b>
-                </li>
-                <li>
-                  <icon class="mam-ic" name="tasks"/>
-                  <b>更多</b>
-                </li> -->
                 <li @click="LogOut">
-                  <icon class="mam-ic" name="power-off"/>
                   <b>注销</b>
                 </li>
               </ul>
             </div>
           </div>
           <div class="mam-msg">
-            <p>用户名</p>
-            <p>职务名称</p>
+            <p>{{ userName }}</p>
+            <p>{{ postName }}</p>
           </div>
         </div>
       </div>
@@ -151,6 +98,8 @@
       <tags-view/>
       <app-main/>
     </div>
+
+    <userDialog :isShow.sync="isShow" @is-submit="changes" v-if="isShow" />
   </div>
 </template>
 
@@ -158,14 +107,17 @@
 import { Navbar, Sidebar, AppMain, TagsView } from "./components";
 import ResizeMixin from "./mixin/ResizeHandler";
 import screenfull from "screenfull";
-
+import userDialog from './components/user-dialog'
+import { getStorage } from '@/utils/storage'
+import imgs from "@/assets/defHead.png"
 export default {
   name: "Layout",
   components: {
     Navbar,
     Sidebar,
     AppMain,
-    TagsView
+    TagsView,
+    userDialog
   },
   mixins: [ResizeMixin],
   data() {
@@ -173,7 +125,11 @@ export default {
       isFullscreen: false,
       setting: false,
       msgSelf: false,
-      list: false,
+      userName:"",
+      list:false,
+      isShow: false,
+      postName:"暂无岗位",
+      headerImg:""
     };
   },
   computed: {
@@ -190,10 +146,36 @@ export default {
         withoutAnimation: this.sidebar.withoutAnimation,
         mobile: this.device === "mobile"
       };
+    },
+    Applist(){
+      return this.$store.state.user.app;
+    },
+    userInfo() {
+      return JSON.parse(getStorage('userInfo')) || {}
     }
   },
- 
+  mounted(){
+    setTimeout( () => {
+      this.reloads()
+    },1000);
+    this.GetApp();
+  },
   methods: {
+    changes(info){
+      // 需要刷新个人信息
+      this.reloads()
+    },
+    reloads(){
+      // prime
+      let nowPosi = JSON.parse(sessionStorage.getItem("userInfo")).positionList.filter( s => s.prime)
+      this.userName = JSON.parse(sessionStorage.getItem("userInfo")).name
+      if(nowPosi.length == 0){
+        this.postName = "暂无岗位"
+      }else{
+        this.postName = nowPosi[0].name
+      }
+      this.headerImg = JSON.parse(sessionStorage.getItem("userInfo")).avatar || imgs
+    },
      handleSelect() {},
     querySearchAsync() {},
     clicsk() {
@@ -220,9 +202,24 @@ export default {
     handleClickOutside() {
       this.$store.dispatch("closeSideBar", { withoutAnimation: false });
     },
+    GetApp() {
+      this.$store.dispatch("GetApp");
+    },
+    skipApp(appCode,name){
+      const {href} = this.$router.resolve({
+          path: `/${appCode}`,
+          name: `${name}`,
+          params: {
+             
+          }
+      });
+      window.open(href, '_blank');
+    },
     // 退出登录
     LogOut() {
       this.$store.dispatch('LogOut').then(() => {
+        sessionStorage.removeItem('ids')
+        sessionStorage.removeItem('userInfo')
         window.location.reload()
       })
     }
@@ -600,5 +597,11 @@ export default {
   height: 100%;
   position: absolute;
   z-index: 999;
+}
+.mam-Applist{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    white-space: nowrap;
 }
 </style>

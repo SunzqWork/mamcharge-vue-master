@@ -1,14 +1,15 @@
 <template>
   <div class="add-role-dialog">
     <el-dialog :title="title" :visible="isShow" width="850px" @close="close">
-      <div class="container">
-        <el-tabs type="card" v-model="tabName" @tab-click="tabClick">
+      <div class="container zl-height-450">
+        <el-tabs type="border-card" v-model="tabName" @tab-click="tabClick">
           <el-tab-pane label="基本信息" name="0">
             <el-form
               class="zl-form"
               :model="roleInfo"
               :rules="rules"
               label-width="120px"
+              style="750px;"
               ref="form"
             >
               <el-form-item label="角色名称" prop="name">
@@ -17,79 +18,86 @@
                   class="zl-form-control zl-input-240px"
                   placeholder="请输入角色名称"
                   :maxlength="20"
+                  :disabled="isDisabled"
                 ></el-input>
               </el-form-item>
-              <el-form-item label="所属机构" prop="orgName" class="required-class">
+              <el-form-item label="所属分部" prop="orgName" class="required-class">
                 <el-input
                   v-model="roleInfo.orgName"
                   disabled
-                  placeholder="请选择角色所属机构"
+                  placeholder="请选择角色所属分部"
                   class="zl-form-control zl-input-240px"
                 >
-                  <template slot="append">
+                  <template slot="append" >
+                    <div @click="tests">
                     <i class="el-icon-more pointer" @click="showTree"></i>
+                    </div>
                   </template>
                 </el-input>
               </el-form-item>
-              <el-form-item label="类别" prop="categoryName" class="required-class">
-                <el-input
-                  v-model="roleInfo.categoryName"
-                  disabled
-                  placeholder="请选择角色类别"
-                  class="zl-form-control zl-input-240px"
-                >
-                  <template slot="append">
-                    <i class="el-icon-more pointer" @click="showCategory"></i>
-                  </template>
-                </el-input>
+              <el-form-item label="类型名称" prop="category">
+                <el-select :disabled="isDisabled" class="zl-form-control zl-input-240px" v-model="roleInfo.category" placeholder="请选择角色类型">
+                  <el-option v-for="(item, index) in roleTypeList" :key="index" :label="item.name" :value="item.code"></el-option>
+                </el-select>
               </el-form-item>
-              <el-form-item>
+              <el-form-item label="显示顺序" prop="seq">
+                <el-input :disabled="isDisabled" class="zl-form-control zl-input-240px" v-model="roleInfo.seq"></el-input>
+                <!-- <el-input-number :disabled="isDisabled" class="zl-form-control zl-input-240px" v-model="roleInfo.seq" controls-position="right" :min="1" :max="1000"></el-input-number> -->
+              </el-form-item>
+              <!-- <el-form-item>
                 <el-checkbox v-model="roleInfo.sys">系统角色</el-checkbox>
-              </el-form-item>
+              </el-form-item>-->
               <el-form-item label="角色说明" prop="remark">
-                <el-input v-model="roleInfo.remark" class="zl-form-control" type="textarea"></el-input>
-              </el-form-item>
-              <el-form-item>
-                <el-button class="btn-theme" @click="submit">保存</el-button>
-                <el-button class="btn-default" @click="saveClone">保存并克隆权限</el-button>
-                <el-button class="btn-default" @click="saveSet">保存并设置权限</el-button>
+                <el-input :maxlength="80" :disabled="isDisabled" style="width: 605px !important;" v-model="roleInfo.remark" class="zl-form-control" type="textarea"></el-input>
               </el-form-item>
             </el-form>
           </el-tab-pane>
           <el-tab-pane label="功能权限" v-if="isShowTab" name="1">
             <div>
               <el-row class="mb10 fl">
-                <el-button class="btn-theme" @click="expandAll = true">全部展开</el-button>
-                <el-button class="btn-default" @click="expandAll = false">全部折叠</el-button>
+                <el-button :disabled="isDisabled" class="btn-theme" @click="expandAll = true">全部展开</el-button>
+                <el-button :disabled="isDisabled" class="btn-default" @click="expandAll = false">全部折叠</el-button>
               </el-row>
               <el-row class="mb10 fr">
                 <el-input
                   class="zl-form-control zl-input-240px"
-                  placeholder="目录，菜单，页面，按钮"
+                  placeholder="模块，菜单，按钮"
+                  :disabled="isDisabled"
+                  @change="reapl"
                   v-model="sysParams.name"
                 ></el-input>
-                <el-button class="btn-theme" @click="searchSystem" icon="el-icon-search">搜索</el-button>
+                <el-button :disabled="isDisabled" class="btn-theme" @click="searchSystem" >查询</el-button>
               </el-row>
             </div>
 
-            <tree-table :data="dataTree" :columns="columns" stripe :expand-all="expandAll" border @get-check-ids="getChcekIds"></tree-table>
-            <el-row style="display: table; margin: 20px auto;">
-              <el-button class="btn-theme" @click="setMenus">保存</el-button>
+            <el-scrollbar wrapClass="scrollbar-wrapper" class="zl-height-450">
+              <tree-table
+                :data="dataTree"
+                :columns="columns"
+                stripe
+                :expand-all="expandAll"
+                border
+                @get-check-ids="getChcekIds"
+              ></tree-table>
+            </el-scrollbar>
+
+            <!-- <el-row style="display: table; margin: 20px auto;">
+              <el-button class="btn-theme" @click="setMenus">确定</el-button>
               <el-button class="btn-default" @click="cancel">取消</el-button>
-            </el-row>
+            </el-row> -->
           </el-tab-pane>
           <el-tab-pane label="成员列表" v-if="isShowTab" name="2">
             <el-row class="mb10">
-              <el-button class="btn-theme" icon="el-icon-plus" @click="userVisible = true">添加成员</el-button>
-              <el-button class="btn-default" icon="el-icon-delete" @click="allDel">批量删除</el-button>
+              <el-button :disabled="isDisabled" class="btn-theme"  @click="userVisible = true">添加成员</el-button>
+              <el-button :disabled="isDisabled" class="btn-default"  @click="allDel">删除</el-button>
             </el-row>
 
             <el-table class="zl-table" :data="tableData" stripe @selection-change="userListChange">
-              <el-table-column type="selection" align="left" header-align="left"></el-table-column>
+              <el-table-column type="selection" align="center" header-align="center"></el-table-column>
               <el-table-column label="成员" prop="name" align="left" header-align="left"></el-table-column>
               <el-table-column label="安全级别" prop="securityLevel" align="left" header-align="left"></el-table-column>
               <el-table-column label="岗位" prop="spName" align="left" header-align="left"></el-table-column>
-              <el-table-column label="分部" prop="orgFullName" align="left" header-align="left"></el-table-column>
+              <el-table-column label="所属部门" prop="orgFullName" align="left" header-align="left"></el-table-column>
             </el-table>
             <el-pagination
               background
@@ -102,23 +110,29 @@
               layout="total, sizes, prev, pager, next, jumper"
               :total="total"
             ></el-pagination>
-            <el-row style="display: table; margin: 20px auto;">
-              <el-button class="btn-theme" @click="updateRoleRealtionUser">保存</el-button>
+            <!-- <el-row style="display: table; margin: 20px auto;">
+              <el-button class="btn-theme" @click="updateRoleRealtionUser">确定</el-button>
               <el-button class="btn-default" @click="cancel">取消</el-button>
-            </el-row>
+            </el-row> -->
           </el-tab-pane>
         </el-tabs>
       </div>
-    </el-dialog>
 
+      <div slot="footer" style="text-align: center;" v-if="!isDisabled">
+        <el-button class="btn-theme" @click="submit" v-if="tabName === '0' || tabName === '1'">确定</el-button>
+        <el-button class="btn-default" @click="saveClone" v-if="tabName === '0'">确定并克隆权限</el-button>
+        <el-button class="btn-default" @click="saveSet" v-if="tabName === '0'">确定并设置权限</el-button>
+        <el-button class="btn-default" @click="cancelFunc" v-if="tabName === '0' || tabName === '1'">取消</el-button>
+      </div>
+    </el-dialog>
     <!-- 组织架构树 -->
     <orgTreeDialog :isShow.sync="treeVisible" @handleNodeClick="handleNodeClick" :count="0"></orgTreeDialog>
     <!-- 类别帮助 -->
     <el-dialog title="类别帮助" :visible.sync="categoryVisible" v-if="categoryVisible" width="450px">
       <zlDepartment v-if="categoryVisible" class="zl-block-center" @check-data="checkData"></zlDepartment>
       <span slot="footer" class="dialog-footer">
-        <el-button class="btn-default" @click="categoryVisible = false">取 消</el-button>
-        <el-button class="btn-theme" @click="categoryVisible = false">确 定</el-button>
+        <el-button class="btn-theme" @click="categoryVisible = false">确定</el-button>
+        <el-button class="btn-default" @click="categoryVisible = false">取消</el-button>
       </span>
     </el-dialog>
     <!-- 成员帮助框 -->
@@ -128,17 +142,20 @@
       v-if="userVisible"
       positions="user"
       @submit-call="submitCall"
-      :whereShows="[2,5]"
+      :whereShows="[1,2,3]"
+      :nowId="nowsId"
     />
-    <!-- 单个角色 -->
-    <!-- 角色 -->
+    
+    <!-- 克隆 -->
     <zl-user-help
       :isShow.sync="roles"
       :clean="true"
+      :isBrn="false"
       :typeCheck="true"
       :positions="'role'"
       @submit-call="callRoles"
-      :whereShows="[2,5]"
+      :whereShows="[1,2]"
+      choice="radio"
     />
   </div>
 </template>
@@ -155,17 +172,18 @@ import {
   getUserListByJS,
   updateRoleRealtionUser,
   getRoleInfoById,
-  delRoleUser
+  delRoleUser,
+  roleTypePageQuery
 } from "@/api/premission";
 import treeTable from "@/components/TreeTable/index";
-
+import { validateInterAndZero, specialStrValidate } from '@/utils/validate'
 export default {
   name: "add-role-dialog",
   components: { orgTreeDialog, zlDepartment, treeTable, zlUserHelp },
   props: {
     title: {
       type: String,
-      default: "新建角色"
+      default: ""
     },
     isShow: {
       type: Boolean,
@@ -178,16 +196,50 @@ export default {
     data: {
       type: Object,
       default: () => {}
+    },
+    isDisabled: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
+    const validateSeq2 = (rule, value, callback) => {
+      if (value === '' || value === null || value === undefined) {
+        callback()
+      } else {
+        if (!validateInterAndZero(value)) {
+          callback(new Error('只能输入0以及正整数'))
+        } else {
+          if (value < 0 || value > 9999) {
+            callback(new Error('只能输入1-9999'))
+          } else {
+            callback()
+          }
+        }
+      }
+    }
+
+    const validateSpecialStr = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请输入角色名称'))
+      } else {
+        if (specialStrValidate(value)) {
+          callback(new Error('角色名称输入不合法'))
+        } else {
+          callback()
+        }
+      }
+    }
     return {
       roles: false,
-      roleInfo: JSON.parse(JSON.stringify(this.data)),
+      roleInfo: this.data || {},
       rules: {
-        name: [{ required: true, message: "角色名称必填", trigger: "blur" }]
+        name: [{ required: true, message: "请输入角色名称", trigger: "blur" }, { validator: validateSpecialStr, trigger: 'blur' }],
+        category: [{ required: true, message: "请选择类型名称", trigger: "change" }],
+        seq: [{ required: false },{ validator: validateSeq2, trigger: 'blur' }]
       },
       treeVisible: false,
+      nowsId:"",
       roleGroupList: [],
       categoryVisible: false,
       columns: [
@@ -218,16 +270,23 @@ export default {
       tabName: "0",
       userIds: [],
       checkList: [],
-      sysParams: { name: '' }
+      sysParams: { name: "" },
+      params: {
+        page: 1,
+        size: 100
+      },
+      roleTypeList: [],
+      clone: false, // 用来标识是否点了 ”确定并克隆全选“ 这个按钮
+      changeTreeFlag: false // 是否处罚过树形表格
     };
   },
   watch: {
-    data() {
-      this.roleInfo = JSON.parse(JSON.stringify(this.data));
+    roles() {
+      this.clone = this.roles
     },
     isShow() {
       if (this.isShow) {
-        this.roleInfo = JSON.parse(JSON.stringify(this.data));
+        this.roleInfo = this.data;
         this.getTypeList();
       }
     },
@@ -242,63 +301,89 @@ export default {
     }
   },
   methods: {
+    tests(){
+    },
+    reapl(){
+      this.sysParams.name = this.sysParams.name.replace(/\s+/g,"")
+    },
+    cancelFunc() {
+      // this.$emit("is-submit");
+      this.$emit('update:isShow', false)
+    },
+    // 获取角色类别
+    roleTypePageQuery() {
+      roleTypePageQuery(this.params).then(res => {
+        if (res.success) {
+          this.roleTypeList = res.data.records.filter(item => {
+            return item.status === 1
+          })
+        } else {
+          this.$message.error('获取角色类别数据失败，请联系管理员。')
+        }
+      }).catch(err => {
+      })
+    },
 
     getChcekIds(checkList) {
-      this.checkList = checkList
+      this.changeTreeFlag = true
+      this.checkList = checkList;
     },
 
     userListChange(rows) {
-      this.userIds = rows.map(val => val.id)
+      this.userIds = rows.map(val => val.id);
     },
 
     // 删除角色下面关联的成员
     allDel() {
       if (this.userIds.length === 0) {
         this.$message({
-          type: 'warning',
-          message: '请选择要删除的数据'
-        })
+          type: "error",
+          message: "请选择要删除的数据"
+        });
 
-        return false
+        return false;
       }
       const strHtml = `
         <p class="zl-confirm-html">
           <i class="el-icon-warning"></i>
           <span>此操作将永久删除成员, 是否继续?</span>
         </p>
-      `
-      this.$confirm(strHtml, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+      `;
+      this.$confirm(strHtml, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
         dangerouslyUseHTMLString: true
-      }).then(() => {
-        delRoleUser(this.roleInfo.id, this.userIds).then(res => {
-          if (res.success) {
-            this.$message.success('删除成功')
-            this.getUserListByJS()
-          } else {
-            this.$message.error('删除失败，请联系管理员。')
-          }
-        }).catch(err => {
-          console.log(err)
-        }) 
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        });        
       })
+        .then(() => {
+          delRoleUser(this.roleInfo.id, this.userIds)
+            .then(res => {
+              if (res.success) {
+                this.$message.success("删除成功");
+                this.getUserListByJS();
+                // 
+                this.$parent.reload()
+              } else {
+                this.$message.error(res.errmsg);
+              }
+            })
+            .catch(err => {
+            });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     },
     saveClone() {
       if (!this.roleInfo.orgId) {
-        this.$message.error("请选择所属机构");
+        this.$message.error("请选择所属分部");
         return false;
       }
-      if (!this.roleInfo.category) {
-        this.$message.error("请选择类别");
-        return false;
-      }
-      this.roles = true;
+      this.clone = true
+      // this.submit()
+      this.baseInfo()
     },
     handleSizeChange(size) {
       this.userparams.size = size;
@@ -320,6 +405,7 @@ export default {
       });
 
       this.tableData = [...this.tableData, ...data];
+      this.updateRoleRealtionUser()
     },
     // 成员列表
     getUserListByJS() {
@@ -341,64 +427,112 @@ export default {
         .then(res => {
           if (res.success) {
             this.$message.success("角色设置成员成功");
-            this.$emit('change-role');
-            this.$emit("update:isShow", false);
+            this.$emit("change-role");
+            this.getUserListByJS()
           } else {
-            this.$message.error("角色设置成员失败，请联系管理员。");
+            this.$message.error(res.errmsg);
           }
         })
         .catch(err => {});
     },
-    // 应用搜索
+    // 应用查询
     searchSystem() {
-      this.GroupBySys()
+      this.GroupBySys();
     },
-    // 保存并设置权限
+    // 确定并设置权限
     saveSet() {
-      if (!this.roleInfo.orgId) {
-        this.$message.error("请选择所属机构");
-        return false;
-      }
-      if (!this.roleInfo.category) {
-        this.$message.error("请选择类别");
-        return false;
-      }
+      // if (!this.roleInfo.orgId) {
+      //   this.$message.error("请选择所属分部");
+      //   return false;
+      // }
+      // if (!this.roleInfo.category) {
+      //   this.$message.error("请选择类型名称");
+      //   return false;
+      // }
       this.$refs["form"].validate(valid => {
         if (valid) {
-          addRole(this.roleInfo)
+          if (this.roleInfo.id) {
+            getRoleInfoById(this.roleInfo.id).then(response => {
+              if (response.success) {
+                this.roleInfo = { ...response.data, ...this.roleInfo }
+                updateRole(this.roleInfo.id, this.roleInfo).then(res => {
+                  if (res.success) {
+                    this.$message.success("角色信息修改成功");
+                    // 设置完成跳转重新加载
+                    this.tabName = '1';
+                    this.GroupBySys();
+                    this.roleInfo = res.data;
+                  this.$emit("is-submit", this.roleInfo);
+                  } else {
+                    this.$message.error(res.errmsg);
+                  }
+                }).catch(err => {
+                });
+              } else {
+                this.$message.error('获取角色信息失败，请联系管理员。')
+              }
+            }).catch(err => {
+            })
+          } else {
+            addRole(this.roleInfo)
             .then(res => {
               if (res.success) {
                 this.$message.success("角色新增成功");
+                // 设置完成跳转重新加载
+                this.tabName = '1';
+                this.GroupBySys();
                 this.isShowTab = true;
-                this.roleInfo = res.data;
-                this.$emit("is-submit", this.roleInfo);
+                this.roleInfo = res.data
+                  this.$emit("is-submit", this.roleInfo);
               } else {
-                this.$message.error("角色新增失败，请联系管理员。");
+                this.$message.error(res.errmsg);
               }
             })
-            .catch(err => {});
+            .catch(err => {
+            });
+          }
         } else {
         }
       });
     },
 
-    // 保存功能权限
-    setMenus() {
-      
-      let menuIds = []
+    // 确定功能权限
+    setMenus(flag) {
+      let menuIds = [];
+      if (this.checkList.length === 0 && !this.changeTreeFlag) {
+        // 说明是没有选择功能权限，没有触发也就得不到菜单id,赋值之前的id
+        this.checkList = (JSON.parse(this.roleInfo.extra) instanceof Array) ? JSON.parse(this.roleInfo.extra) : []
+      }
+
       this.checkList.forEach(val => {
         if (!val.sys) {
-          menuIds.push(val.menuId)
+          menuIds.push(val.menuId);
         }
-      })
-
-      updateRole(this.roleInfo.id, { menuIds: Array.from(new Set([...menuIds])), extra: JSON.stringify(this.checkList) })
+      });
+      this.roleInfo = {...this.roleInfo, ...{
+        menuIds: Array.from(new Set([...menuIds])),
+        extra: JSON.stringify(this.checkList)
+      }}
+      updateRole(this.roleInfo.id, this.roleInfo)
         .then(res => {
+          this.clone = false
           if (res.success) {
-            this.$message.success("功能权限保存成功");
-            this.$emit('change-role');
+            this.isShowTab = true
+            if (flag) {
+              this.$message.success("权限克隆成功");
+            } else {
+              this.$message.success("功能权限确定成功");
+              // this.$emit('update:isShow', false)
+                  this.$emit("is-submit", this.roleInfo);
+            }
+            this.roleInfo = res.data
+            this.$emit("change-role");
           } else {
-            this.$message.error("功能权限保存失败，请联系管理员。");
+            if (flag) {
+              this.$message.error("权限克隆失败，请联系管理员。");
+            } else {
+              this.$message.error("功能权限确定失败，请联系管理员。");
+            }
           }
         })
         .catch(err => {});
@@ -408,19 +542,18 @@ export default {
       GroupBySys(this.sysParams)
         .then(res => {
           if (res.success) {
-            
-            let menus = []
-            let ids = []
+            let menus = [];
+            let ids = [];
             if (this.roleInfo.extra) {
-              menus = JSON.parse(this.roleInfo.extra)
-              ids = menus.map(val => val.menuId)
+              menus = JSON.parse(this.roleInfo.extra);
+              ids = menus.map(val => val.menuId);
             }
 
             const loop = obj => {
               if (obj.children && obj.children.length > 0) {
                 obj.children.forEach(val => {
                   if (ids.includes(val.id)) {
-                    const m = menus[ids.indexOf(val.id)]
+                    const m = menus[ids.indexOf(val.id)];
                     val.noButton = val.name;
                     val.isCheck = true;
                     val.isIndeterminate = m.isIndeterminate;
@@ -431,12 +564,12 @@ export default {
                     val.isIndeterminate = false;
                     val.checkAll = false;
                   }
-                  
-                  if (val.type === 2) {
+
+                  if (val.type === 1) {
                     if (val.children && val.children.length > 0) {
                       val.btns = val.children.map(item => {
                         if (ids.includes(item.id)) {
-                          const m = menus[ids.indexOf(item.id)]
+                          const m = menus[ids.indexOf(item.id)];
                           item.button = item.name;
                           item.isCheck = true;
                           item.isIndeterminate = m.isIndeterminate;
@@ -454,7 +587,7 @@ export default {
                       val.btns = [];
                     }
                   }
-                  if (val.type !== 3) {
+                  if (val.type !== 2) {
                     loop(val);
                   }
                 });
@@ -462,9 +595,8 @@ export default {
             };
 
             res.data.forEach(val => {
-
               if (ids.includes(val.id)) {
-                const m = menus[ids.indexOf(val.id)]
+                const m = menus[ids.indexOf(val.id)];
                 val.children = val.menus;
                 val.noButton = val.name;
                 val.isCheck = true;
@@ -477,10 +609,9 @@ export default {
                 val.isIndeterminate = false;
                 val.checkAll = false;
               }
-              
+
               loop(val);
             });
-
           } else {
             this.$message.error("获取功能权限菜单树失败，请联系管理员。");
           }
@@ -488,7 +619,6 @@ export default {
           this.dataTree = res.data;
         })
         .catch(err => {
-          console.log(err)
         });
     },
     getAuth(data) {
@@ -514,95 +644,128 @@ export default {
     cancel() {
       this.$emit("update:isShow", false);
     },
+
+    // 克隆 克隆之前需要先确定基本信息，基本信息验证通过之后在弹出帮助框
     callRoles(s) {
-      if (this.isShowTab) {
-        /**
-         * 编辑
-         */
-        getRoleInfoById(s[0].id)
-          .then(
-            req => {
-              updateRole(this.roleInfo.id, {
-                ...this.roleInfo,
-                menuIds: req.data.menuIds
-              }).then(s => {
-                console.log(s);
-                s.errcode == 0 ? (this.roleInfo.menuIds = s.data.menuIds) : "";
-              });
-            },
-            err => {}
-          )
-          .catch(error => {
-            console.log(error)
-          });
-      } else {
-        /**
-         * 新增
-         */
-        this.submit(function(s, clone) {
-          getRoleInfoById(clone[0].id)
-            .then(
-              req => {
-                updateRole(s.id, {
-                  ...s,
-                  menuIds: req.data.menuIds
-                });
-              },
-              err => {}
-            )
-            .catch(error => {});
-        }, s);
+      if (s.length == 0) {
+        this.$message({
+          type: 'warning',
+          message: '克隆角色的权限为空'
+        })
+        return false
+      }
+      const id = s[0].id
+      getRoleInfoById(id).then(res => {
+        if (res.success) {
+          this.roleInfo = { ...res.data, ...this.roleInfo }
+          if (!res.data.extra) {
+            // this.$message.error('字段extra为null，请联系管理员查看')
+			this.$message.success("权限克隆成功");
+            return false
+            // this.checkList = []
+          }
+            this.checkList = JSON.parse(res.data.extra)
+          this.setMenus()
+        } else {
+          this.$message.error('查询角色信息失败，请联系管理员。')
+        }
+      }).catch(err => {
+
+      })
+    },
+
+    submit() {
+      switch(this.tabName) {
+        case '0': 
+          // 基本信息
+          this.baseInfo()
+          break
+        case '1':
+          // 功能权限
+          this.setMenus()
+          break
+        case '2':
+          // 成员列表
+          this.isShow = false
+          // this.updateRoleRealtionUser()
+          break
+        default: 
+          break
       }
     },
-    submit(call, menuId) {
+
+    // 基本信息
+    baseInfo() {
       if (!this.roleInfo.orgId) {
-        this.$message.error("请选择所属机构");
+        this.$message.error("请选择所属分部");
         return false;
       }
-      if (!this.roleInfo.category) {
-        this.$message.error("请选择类别");
-        return false;
-      }
+      let flag = false
       this.$refs["form"].validate(valid => {
         if (valid) {
-          if (this.isShowTab) {
+          if (this.roleInfo.id) {
             // 编辑
-            updateRole(this.roleInfo.id, this.roleInfo)
-              .then(res => {
-                if (res.success) {
-                  this.$message.success("角色修改成功");
-                  this.$emit("is-submit", this.roleInfo);
-                  this.$emit("update:isShow", false);
-                } else {
-                  this.$message.error("角色修改失败，请联系管理员。");
-                }
-              })
-              .catch(err => {});
+            getRoleInfoById(this.roleInfo.id).then(response => {
+              if (response.success) {
+                this.roleInfo = { ...response.data, ...this.roleInfo }
+                updateRole(this.roleInfo.id, this.roleInfo).then(res => {
+                  if (res.success) {
+                    flag = true
+                    this.$message.success("角色信息修改成功");
+                    this.$emit("is-submit", this.roleInfo);
+                    this.isShowTab = true;
+                    this.roleInfo = res.data
+                    // 如果基本信息通过并且是点击了 ”确定并克隆权限“ 按钮
+                    if (flag) {
+                      if (this.clone) {
+                        this.roles = true
+                      } else {
+                        this.$emit("update:isShow", false);
+                      }
+                    }
+                  this.getUserListByJS()
+                  } else {
+                    this.$message.error(res.errmsg);
+                  }
+                }).catch(err => {
+                });
+              } else {
+                this.$message.error('获取角色信息失败，请联系管理员。')
+              }
+            }).catch(err => {
+            })
           } else {
             addRole(this.roleInfo)
               .then(res => {
                 if (res.success) {
+                  flag = true
                   this.$message.success("角色新增成功");
+                  this.isShowTab = true;
                   this.$emit("is-submit", this.roleInfo);
-                  if (typeof call == "function") {
-                    this.$emit("update:isShowTabFlag", true);
-                    this.isShowTab = true;
-                    this.roleInfo = res.data
-                    return call(res.data, menuId);
+                  this.roleInfo = res.data
+                  if (flag) {
+                    if (this.clone) {
+                      this.roles = true
+                    } else {
+                      this.$emit("update:isShow", false);
+                    }
                   }
-                  this.$emit("update:isShow", false);
+                  this.getUserListByJS()
                 } else {
-                  this.$message.error("角色新增失败，请联系管理员。");
+                  this.$message.error(res.errmsg);
                 }
               })
-              .catch(err => {});
+              .catch(err => {
+              });
+              
           }
         } else {
         }
-      });
+      })
     },
     close() {
-      this.$emit("update:isShow", false);
+      // this.$emit("is-submit");
+      this.$emit('update:isShow', false)
     },
     handleNodeClick(obj) {
       this.roleInfo.orgId = obj.id;
@@ -635,13 +798,20 @@ export default {
     tabClick(name) {
       if (this.tabName === "0") {
       } else if (this.tabName === "1") {
-        this.GroupBySys();
+        // this.GroupBySys();
       } else if (this.tabName === "2") {
         this.getUserListByJS();
       } else {
         // TODO
       }
     }
+  },
+  mounted() {
+    // 改为只请求一次
+    this.GroupBySys();
+    this.nowsId = this.roleInfo.orgId
+    this.roleInfo.orgName = this.roleInfo.org_name || this.roleInfo.orgName
+    this.roleTypePageQuery()
   }
 };
 </script>

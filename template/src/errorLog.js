@@ -13,7 +13,6 @@ if (process.env.NODE_ENV === 'production') {
         info,
         url: window.location.href
       })
-      console.error(err, info)
     })
   }
 }

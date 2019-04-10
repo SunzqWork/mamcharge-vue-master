@@ -7,8 +7,8 @@
       suffix-icon="el-icon-search"
       style="display:table;margin: 0 auto;margin-bottom: 20px;"/>
       <el-scrollbar class="mam-change" style="height: 100%;" wrap-class="scrollbar-wrapper">
-
-    <el-tree
+      <div >
+        <el-tree
       ref="tree"
       :data="data"
       :filter-node-method="filterNode"
@@ -17,6 +17,7 @@
       :default-expand-all="openAll"
       :show-checkbox="isCheck"
       @check-change="handleCheckChange"
+      :indent="8"
       @node-click="handleNodeClick">
       <span 
         slot-scope="{ node, data }" 
@@ -33,10 +34,27 @@
           v-show="data.type === 3"
           class="icon"
           icon-class="department" />
-        <span :title="node.label" style="font-size: 14px;">{{ node.label }} 
-          <span v-if="isCount">({{ data.staffCount | peopleFilter }}<span v-show="!isNaN(Number(data.staffCount)) && Number(data.staffLimit) !== 0">/</span>{{ data.staffLimit | staffCountFilter }})</span></span>
+
+          <!-- 
+            如果staffLimit为null 那边只显示isCount
+            如果staffLimit有值就显示 xx/xx
+           -->
+        <span :title="node.label" style="font-size: 14px;">
+          <span>{{ node.label }}</span>
+          <span v-if="isCount">
+            <span v-if="data.staffLimit">
+              {{ `(${data.staffCount}/${data.staffLimit})` }}
+            </span>
+            <span v-else>
+              {{ data.staffCount ? `(${data.staffCount})` : '' }}
+            </span>
+          </span>
+          
+          <!-- <span v-if="isCount">({{ data.staffCount | peopleFilter }}<span v-show="!isNaN(Number(data.staffCount)) && Number(data.staffLimit) !== 0">/</span>{{ data.staffLimit | staffCountFilter }})</span></span> -->
+        </span>
       </span>
     </el-tree>
+      </div>
   </el-scrollbar>
   </div>
 </template>
@@ -102,13 +120,9 @@ export default {
           this.$message({ type: 'warning', message: data.message })
         }
       }).catch(err => {
-        console.log(err)
       })
     },
     handleCheckChange(obj, check, indeterminate) {
-      console.log(obj)
-      console.log(check)
-      console.log(indeterminate)
     },
     filterNode(value, data) {
       if (!value) return true
@@ -119,6 +133,10 @@ export default {
 </script>
 <style lang="scss">
 @import '@/styles/theme.scss';
+
+.el-tree-node__content{
+  height: 28px !important;
+}
 
 .org-tree{
   height: 100%;

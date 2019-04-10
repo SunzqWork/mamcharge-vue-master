@@ -43,7 +43,6 @@ export function getMonths(startdata, enddata) {
 export function getMaxdate(dataArr) {
   var newArray = Array.from(new Set(dataArr))
   var maxNum = Math.max(...newArray)
-  console.log(maxNum)
   return maxNum
 }
 // 获取下个月的今天

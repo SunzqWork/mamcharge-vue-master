@@ -80,3 +80,19 @@
     display: block
   }
 }
+
+
+#app .el-menu--collapse .el-menu .el-submenu, #app .sidebar-container .el-submenu .el-menu-item, #app .sidebar-container .nest-menu .el-submenu>.el-submenu__title {
+  min-width: 180px!important;
+  padding-left: 52px !important;
+}
+
+
+.el-menu-item, .el-submenu__title {
+  height: 46px !important;
+  line-height: 46px !important;
+  position: relative;
+  -webkit-box-sizing: border-box;
+  white-space: nowrap;
+  list-style: none;
+}

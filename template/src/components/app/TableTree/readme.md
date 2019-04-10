@@ -65,7 +65,7 @@
 
   如果不提供，将使用默认的[evalFunc](./eval.js)
 
-  如果提供了evalFunc,那么会用提供的evalFunc去解析data，并返回treeTable渲染所需要的值。如何编写一个evalFunc，请参考[*eval.js*](https://github.com/PanJiaChen/vue-element-admin/blob/master/src/components/TreeTable/eval.js)或[*customEval.js*](https://github.com/PanJiaChen/vue-element-admin/blob/master/src/views/example/table/treeTable/customEval.js)
+  如果提供了evalFunc,那么会用提供的evalFunc去解析data，并取消treeTable渲染所需要的值。如何编写一个evalFunc，请参考[*eval.js*](https://github.com/PanJiaChen/vue-element-admin/blob/master/src/components/TreeTable/eval.js)或[*customEval.js*](https://github.com/PanJiaChen/vue-element-admin/blob/master/src/views/example/table/treeTable/customEval.js)
 
 #### evalArgs
   解析函数的参数，是一个数组

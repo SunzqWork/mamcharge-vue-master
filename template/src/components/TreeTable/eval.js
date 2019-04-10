@@ -4,12 +4,20 @@
 */
 'use strict'
 import Vue from 'vue'
+
+
 export default function treeToArray(data, expandAll, parent = null, level = null) {
   let tmp = []
   Array.from(data).forEach(function(record) {
-    if (record._expanded === undefined) {
-      Vue.set(record, '_expanded', expandAll)
+    // if (record._expanded === undefined) {
+    //   Vue.set(record, '_expanded', expandAll)
+    // }
+    Vue.set(record, '_expanded', expandAll)
+    
+    if (record.isIndeterminate === undefined) {
+      Vue.set(record, 'isIndeterminate', false)
     }
+
     let _level = 1
     if (level !== undefined && level !== null) {
       _level = level + 1
@@ -27,3 +35,4 @@ export default function treeToArray(data, expandAll, parent = null, level = null
   })
   return tmp
 }
+

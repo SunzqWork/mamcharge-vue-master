@@ -19,29 +19,6 @@ const premissionCenter = {
         }
     },
     actions: {
-        // 获取系统菜单
-        // GetSysMenus({ commit }, sysId) {
-        //   return new Promise((resolve, reject) => {
-        //     getMenuTree(sysId).then(res => {
-        //       const routes = getRouteData(res.data)
-        //       routes.unshift({
-        //         path: '',
-        //         meta: { title: '/', icon: '', hidden: true },
-        //         redirect: routes[0].path
-        //       })
-        //       routes.push({
-        //         path: '*',
-        //         meta: { title: '', icon: '', hidden: true },
-        //         redirect: '/404'
-        //       })
-        //       router.addRoutes(routes)
-        //       commit('SET_ROUTES', routes)
-        //       resolve(res)
-        //     }).catch(err => {
-        //       reject(err)
-        //     })
-        //   })
-        // },
         // 退出登录
         Logout({ commit }, token) {
             return new Promise((resolve, reject) => {
@@ -50,9 +27,7 @@ const premissionCenter = {
                         removeToken()
                         resolve(res)
                     }
-                }).catch(err => {
-                    console.log(err)
-                })
+                }).catch(err => {})
             })
         }
     }

@@ -3,7 +3,7 @@
     <zl-card>
       <el-button class="btn-theme" @click="save">
         <svg-icon icon-class="pre-save"></svg-icon>
-        保存
+        确定
       </el-button>
       <el-button class="btn-default" @click="saveCopy" v-show="$route.query.id !== ''">
         <svg-icon icon-class="pre-copy"></svg-icon>
@@ -11,7 +11,7 @@
       </el-button>
       <el-button class="btn-default" @click="$router.go(-1)">
         <svg-icon icon-class="pre-back"></svg-icon>
-        返回
+        取消
       </el-button>
     </zl-card>
     <zl-card isHeader icon="prer-features" :title="$route.meta.title">
@@ -101,7 +101,7 @@ export default {
       } else if(!interValidate(value)) {
         callback(new Error('显示顺序只能是整数'));
       } else if(value.length > 3 || value.length < 1 ) {
-        callback(new Error('显示顺序在999以内'));
+        callback(new Error('显示顺序在0-9999以内'));
       } else {
         callback();
       }
@@ -267,7 +267,6 @@ export default {
             })
           }
         } else {
-          console.log('error submit!!');
           return false;
         }
       })

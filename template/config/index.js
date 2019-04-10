@@ -62,7 +62,7 @@ module.exports = {
          */
         assetsPublicPath: '/',
 
-        assetsApplication: 'SYS',
+        assetsApplication: '{{sysAlias}}',
 
         /**
          * Source Maps

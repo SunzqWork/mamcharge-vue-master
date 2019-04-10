@@ -12,7 +12,7 @@ export default function(data, mime) {
   for (var i = 0; i < data.length; i++) {
     ia[i] = data.charCodeAt(i)
   }
-  // canvas.toDataURL 返回的默认格式就是 image/png
+  // canvas.toDataURL 取消的默认格式就是 image/png
   return new Blob([ia], {
     type: mime
   })

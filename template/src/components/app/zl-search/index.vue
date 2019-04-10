@@ -10,7 +10,7 @@
       <el-button 
         class="btn-theme search-btn" 
         @click="stationSearch" 
-        size="mini">搜索</el-button>
+        size="mini">查询</el-button>
     </div>
   </div>
 </template>
@@ -19,7 +19,7 @@ export default {
   name: 'zl-search',
   props: ['placeholder', 'value'],
   methods: {
-    // 根据站点名称搜索
+    // 根据站点名称查询
     stationSearch() {
       this.$emit('search-btn', this.value)
     }

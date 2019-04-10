@@ -59,6 +59,7 @@ const webpackConfig = merge(baseWebpackConfig, {
             title: '公共框架',
             templateParameters: {
                 BASE_URL: config.build.assetsPublicPath + config.build.assetsSubDirectory,
+                CONFIG_BASE_URL: config.build.assetsPublicPath + config.build.assetsSubDirectory,
             },
             minify: {
                 removeComments: true,
@@ -98,6 +99,11 @@ const webpackConfig = merge(baseWebpackConfig, {
         new CopyWebpackPlugin([{
             from: path.resolve(__dirname, '../static'),
             to: config.build.assetsSubDirectory,
+            ignore: ['.*']
+        }]),
+        new CopyWebpackPlugin([{
+            from: path.resolve(__dirname, '../ZL_Config.js'),
+            to: `${config.build.assetsSubDirectory}/${config.build.assetsApplication}`,
             ignore: ['.*']
         }])
     ],

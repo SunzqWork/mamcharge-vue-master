@@ -24,7 +24,7 @@
     <div class="city-box" v-show="!show">
       <div class="city-top clearfix">
         <p class="city-title fl">{{ provinceName }}</p>
-        <p class="back fr" @click="goBack"><i class="el-icon-d-arrow-left"></i>返回上级</p>
+        <p class="back fr" @click="goBack"><i class="el-icon-d-arrow-left"></i>取消上级</p>
       </div>
       <el-scrollbar wrapClass="scrollbar-wrapper" style="height:240px;width:100%">
         <el-checkbox-group v-model="checkedCities" @change="changeCity">
@@ -147,7 +147,6 @@ export default{
           return item
         })
       }).catch(err => {
-        console.log(err)
       })
     },
     // 进入城市页面

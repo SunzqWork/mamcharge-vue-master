@@ -1,6 +1,27 @@
 <template>
+<div>
+  <el-dialog
+      title="首次登陆重置密码"
+      :visible.sync="dialogVisible"
+      width="450px"
+      :before-close="handleClose">
+      <el-form style="margin-top: 12px;" :model="passwordModel" :rules="passwordRules" label-width="100px" ref="passwordForm">
+        <el-form-item label="旧密码" prop="oldPassword">
+          <el-input class="zl-form-control zl-input-240px" placeholder="请输入旧密码" v-model="passwordModel.oldPassword" :maxlength="50"></el-input>
+        </el-form-item>
+        <el-form-item label="新密码" prop="newPassword">
+          <zl-password @input="getMode" ></zl-password>
+        </el-form-item>
+        <p style="color:#dcdcdc;font-size:12px;line-height: 25px;text-align: center;">{{['',`长度为${min}-27个字符支持数字、字母大小写组合`,`长度为${min}-27个字符支持字母大小写、数字、特殊字符组合`][nix]}}</p>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="changPaw">确 定</el-button>
+        <el-button @click="handleClose">取 消</el-button>
+      </span>
+    </el-dialog>
   <div class="login-container">
-
+    <!-- 首次登陆重置密码 -->
+    
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
@@ -33,7 +54,8 @@
           auto-complete="on"
           @keyup.enter.native="handleLogin" />
         <span class="show-pwd" @click="showPwd">
-          <svg-icon icon-class="eye" />
+          <svg-icon v-if="passwordType == 'password'" icon-class="eye" />
+          <svg-icon v-else icon-class="viewEye" />
         </span>
       </el-form-item>
       
@@ -49,15 +71,19 @@
     </el-dialog>
 
   </div>
+</div>
 </template>
 
 <script>
+import { getSafetyDataList } from "@/api/safety"
+import zlPassword from '@/components/app/zl-password/index'
+import { updatePasswordByUser } from '@/api/premission'
 import LangSelect from '@/components/LangSelect'
 import SocialSign from './socialsignin'
-
+import Cookies from 'js-cookie'
 export default {
   name: 'Login',
-  components: { LangSelect, SocialSign },
+  components: { LangSelect, SocialSign,zlPassword },
   data() {
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
@@ -68,17 +94,41 @@ export default {
     }
     return {
       loginForm: {
-        username: '17663758962',
-        password: '123'
+        // username: 'wangweijun123',
+        // password: 'MAMwangweijun1232019'
+        username: '',
+        password: ''
+        // username: '17663758962',
+        // password: 'Wangweijun1@@'
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', message: '请输入用户名' }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        username: [{ required: true, trigger: 'blur', message: '请输入登录名' }],
+        password: [
+          { required: true, trigger: 'blur', message: '请输入密码'},
+          { validator: validatePassword, trigger: 'blur' }
+        ]
       },
+      formModel: {},
+      dialogVisible:false,
       passwordType: 'password',
       loading: false,
+      nix:0,
+      min:"",
       showDialog: false,
-      redirect: undefined
+      redirect: undefined,
+      passwordModel: {
+        oldPassword: '',
+        username: '',
+        newPassword: ''
+      },
+      passwordRules: {
+        oldPassword: [
+          { required: true, message: '请输入旧密码', trigger: 'blur' }
+        ],
+        newPassword: [
+          { required: true, message: '请输入新密码', trigger: 'blur' }
+        ]
+      },
     }
   },
   watch: {
@@ -90,6 +140,42 @@ export default {
     }
   },
   methods: {
+    handleClose(){
+      sessionStorage.removeItem('ids')
+      Cookies.remove('flag')
+      this.dialogVisible = false
+    },
+    getMode(value, mode) {
+      this.passwordModel.newPassword = value
+      this.mode = mode
+    },
+    offPaw(){
+
+    },
+    changPaw(){
+      this.$refs['passwordForm'].validate(valid => {
+        if (valid) {
+          if (this.mode < 3) {
+            this.$message.warning('密码强度最低为中级的时候才能够进行修改')
+            return false
+          }
+
+          this.passwordModel.username = this.formModel.username
+          updatePasswordByUser(sessionStorage.getItem("ids"), this.passwordModel).then(res => {
+            if(res.success){
+              sessionStorage.removeItem('ids')
+              Cookies.remove('flag')
+              this.dialogVisible = false
+              this.$message.success('修改密码成功'); 
+            }else{
+              this.$message.error(res.errmsg); 
+            }
+        })
+        } else {
+        }
+      })
+        
+    },
     showPwd() {
       if (this.passwordType === 'password') {
         this.passwordType = ''
@@ -98,24 +184,43 @@ export default {
       }
     },
     handleLogin() {
-      debugger;
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('LoginByUsername', this.loginForm).then(() => {
+          this.$store.dispatch('LoginByUsername', this.loginForm).then(req => {
+            // return
+            if(req.success){
             this.loading = false
-            this.$store.dispatch('GetUserInfo')
-            this.$store.dispatch('GetSysMenus', 66)
+            this.$store.dispatch('GetUserInfo').then( s => {
+              if(s.success){
+                 this.$store.dispatch('GetSysMenus', window.sysId)
+              }
+            })
             // this.$router.push({ path: this.redirect || '' })
             this.$router.push('/')
+            }else{
+              this.$message.error(req.errmsg); 
+            }
+            this.loading = false
           }).catch(() => {
             this.loading = false
           })
         } else {
-          console.log('error submit!!')
           return false
         }
       })
+    }
+  },
+  mounted() {
+    if (Cookies.get('flag')) {
+      if (Cookies.get('flag') == 1 && sessionStorage.getItem("ids")) {
+        // 修改
+        getSafetyDataList().then( s=> {
+          this.nix = s.data[0].pwdComplexity
+          this.min = s.data[0].pwdLength
+        })
+        this.dialogVisible = true;
+      }
     }
   }
 }
@@ -161,14 +266,14 @@ export default {
     }
     .el-form-item {
       border: 1px solid rgba(255, 255, 255, 0.1);
-      background: rgba(0, 0, 0, 0.1);
+      // background: rgba(0, 0, 0, 0.1);
       border-radius: 5px;
       color: #454545;
     }
   }
 </style>
 
-<style rel="stylesheet/scss" lang="scss" scoped>
+<style rel="stylesheet/scss" lang="scss">
 $bg:#2d3a4b;
 $dark_gray:#889aa4;
 $light_gray:#eee;
@@ -233,6 +338,11 @@ $light_gray:#eee;
     position: absolute;
     right: 35px;
     bottom: 28px;
+  }
+
+  .el-input__inner {
+    border: none !important;
+    font-size: 14px;
   }
 }
 </style>

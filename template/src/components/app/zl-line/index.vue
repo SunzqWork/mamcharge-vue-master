@@ -29,6 +29,10 @@ export default {
     split: {
       type: String,
       default: "/"
+    },
+    insNow:{
+      type: Number,
+      default: ""
     }
   },
   watch: {
@@ -52,7 +56,7 @@ export default {
     clicks(s) {
       this.dataLine = this.data.slice(0, ++s);
       this.lastIns = this.dataLine.length;
-      this.$emit("line-click", s);
+      this.$emit("line-click", s,this.insNow);
     }
   }
 };

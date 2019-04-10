@@ -1,0 +1,9 @@
+.inputs{
+	font-size: 14px;
+	height: 36px;
+	line-height:36px;
+	border: 1px solid #bebebe !important;
+	border-radius: 5px;
+	padding-left: 15px;
+	width: 240px;
+}

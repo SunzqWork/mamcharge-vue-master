@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- <svg
+    <svg
       t="1508738709248"
       class="screenfull-svg"
       viewBox="0 0 1024 1024"
@@ -23,16 +23,15 @@
       <path
         d="M333.590658 594.033341 167.8171 759.804852 64.218604 655.67219 64.218604 958.270996 366.342596 958.502263 262.234493 855.071589 428.421466 688.86108Z"
         p-id="2073"/>
-    </svg>-->
-    <img class="screenfull" src="@/assets/locks.png" @click="click" alt>
+    </svg>
   </div>
 </template>
 
 <script>
-import screenfull from "screenfull";
+// import screenfull from 'screenfull'
 
 export default {
-  name: "Screenfull",
+  name: 'Screenfull',
   props: {
     width: {
       type: Number,
@@ -44,42 +43,36 @@ export default {
     },
     fill: {
       type: String,
-      default: "#48576a"
+      default: '#48576a'
     }
   },
   data() {
     return {
       isFullscreen: false
-    };
+    }
   },
   methods: {
     click() {
       if (!screenfull.enabled) {
         this.$message({
-          message: "you browser can not work",
-          type: "warning"
-        });
-        return false;
+          message: 'you browser can not work',
+          type: 'warning'
+        })
+        return false
       }
-      screenfull.toggle();
+      screenfull.toggle()
     }
   }
-};
+}
 </script>
 
 <style scoped>
 .screenfull-svg {
   display: inline-block;
   cursor: pointer;
-  fill: #5a5e66;
+  fill: #5a5e66;;
   width: 20px;
   height: 20px;
   vertical-align: 10px;
-}
-.screenfull {
-  width: 28px;
-  height: 28px;
-  margin: auto;
-  display: block;
 }
 </style>

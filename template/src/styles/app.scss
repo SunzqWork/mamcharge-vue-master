@@ -28,5 +28,12 @@
 }
 
 .zl-height-450{
-  height: 450px;
+  height: 400px;
+  width: 100%;
+  overflow-y: auto;
+}
+
+.zl-btn-center{
+  text-align: center;
+  overflow: hidden;
 }

@@ -1,5 +1,15 @@
 <template>
-  <el-table :data="formatData" :row-style="showRow" v-bind="$attrs" stripe class="zl-table">
+  <el-table 
+    :data="formatData" 
+    :row-style="showRow" 
+    v-bind="$attrs" 
+    :header-align="'center'"
+    stripe 
+    class="zl-table" 
+    border 
+    highlight-current-row 
+    :height="tableHeight" 
+    @current-change="handleCurrentChange">
     <el-table-column v-if="columns.length===0" width="150">
       <template slot-scope="scope">
         <span v-for="space in scope.row._level" :key="space" class="ms-tree-space"/>
@@ -10,7 +20,7 @@
         {{ scope.$index }}
       </template>
     </el-table-column>
-    <el-table-column v-for="(column, index) in columns" v-else :key="column.value" :label="column.text" :width="column.width">
+    <el-table-column v-for="(column, index) in columns" v-else :key="column.value" :label="column.text" :width="column.width" :show-overflow-tooltip="true" header-align="center">
       <template slot-scope="scope">
         <!-- Todo -->
         <!-- eslint-disable-next-line vue/no-confusing-v-for-v-if -->
@@ -55,6 +65,10 @@ export default {
     isCheckList: {
       type: Array,
       default: () => { return [] }
+    },
+    association: { // true 父子级关联 false 父子级不做关联
+      type: Boolean,
+      default: true
     }
   },
   computed: {
@@ -69,16 +83,28 @@ export default {
       const func = this.evalFunc || treeToArray
       const args = this.evalArgs ? Array.concat([tmp, this.expandAll], this.evalArgs) : [tmp, this.expandAll]
       return func.apply(null, args)
+    },
+
+    tableHeight() {
+      return this.$store.state.app.$th
     }
   },
   watch: {
     isCheckList() {
       this.dataShow()
+    },
+    data() {
+      this.dataShow()
+    },
+    formatData(data) {
+      this.$store.dispatch('action_set_table_height', data.length)
     }
   },
   methods: {
+    handleCurrentChange(currentRow) {
+      this.$emit('current-row', currentRow)
+    },
     dataShow() {
-      
       if (this.isCheckList.length > 0) {
         // 说明有回显的数据
         let arr = []
@@ -92,7 +118,9 @@ export default {
 
         arr.forEach(val => {
           val.check = true
-           this.setParentProps(val.pid)
+          if (this.association) {
+            this.setParentProps(val.pid)
+          }
         })
       }
     },
@@ -154,27 +182,46 @@ export default {
     },
     // 复选框状态发生变化
     handlerNodeCheck(row) {
-
-      if (row.indeterminate) {
-        row.indeterminate = false
-        row.check = true
-      }
-
-      // 得到所有的级联子孙
-      const loop = (obj) => {
-        if (obj.children && obj.children.length > 0) {
-          obj.children.forEach(val => {
-            val.check = row.check
-            val.indeterminate = row.indeterminate
-            loop(val)
-          })
+      if (this.association) {
+        if (row.indeterminate) {
+          row.indeterminate = false
+          row.check = true
         }
       }
 
-      loop(row)
+      // 得到所有的级联子孙
+      if (this.association) {
+        const loop = (obj) => {
+          if (obj.children && obj.children.length > 0) {
+            obj.children.forEach(val => {
+              val.check = row.check
+              val.indeterminate = row.indeterminate
+              loop(val)
+            })
+          }
+        }
+
+        loop(row)
+      }
+
+      // if (!this.association && row.check)
+      if (!this.association) {
+        const loop = (obj) => {
+          if (obj.children && obj.children.length > 0) {
+            obj.children.forEach(val => {
+              val.check = row.check
+              loop(val)
+            })
+          }
+        }
+
+        loop(row)
+      }
       
-      // 关联父级
-      this.setParentProps(row.pid)
+      if (this.association) {
+        // 关联父级
+        this.setParentProps(row.pid)
+      }
 
       // 通知父级
       this.$emit('get-node', this.formatData)
@@ -182,6 +229,7 @@ export default {
   },
   mounted() {
     this.dataShow()
+    this.$store.dispatch('action_set_table_height', this.formatData.length + 6)
   }
 }
 </script>

@@ -4,9 +4,11 @@
     :style="{marginBottom: isCondition ? '34px' : '20px'}"
   >
     <el-card class="box-card">
-      <div class="card-title" v-if="isHeader">
-        <svg-icon v-if="icon !== ''" :icon-class="icon" class="icon"/>
-        <span>{{ title }}</span>
+      <!-- class="card-title" -->
+      <div  v-if="isHeader">
+        <!-- <svg-icon v-if="icon !== ''" :icon-class="icon" class="icon"/>
+        <span>{{ title }}</span> -->
+        <zl-title :title="title"></zl-title>
       </div>
       <div
         :class="[isHeader ? 'slot-html' : 'slot-html-no',isCondition ? ` zl-full${random} slot-tran` : 'slot-tran']"
@@ -23,8 +25,13 @@
   </div>
 </template>
 <script>
+import zlTitle from '@/components/app/zl-title/index'
+
 export default {
   name: "zl-card",
+  components: {
+    zlTitle
+  },
   props: {
     isCondition: {
       type: Boolean,

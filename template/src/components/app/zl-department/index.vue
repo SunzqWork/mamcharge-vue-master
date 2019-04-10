@@ -17,7 +17,7 @@
       <!-- 编辑 -->
       <div class="department-input clearfix" v-show="editFlag">
         <el-input size="mini" placeholder="请输入新的类别名称（必填）" v-model.trim="updateName" :maxlength="16"></el-input>
-        <el-button size="mini" class="add-button btn-theme fr" @click="updateType">保存修改</el-button>
+        <el-button size="mini" class="add-button btn-theme fr" @click="updateType">确定修改</el-button>
       </div>
     </div>
   </div>
@@ -65,7 +65,6 @@ export default {
           })
         }
       }).catch(err => {
-        console.log(err)
       })
     },
     addNewType() {
@@ -106,7 +105,6 @@ export default {
             })
           }
         }).catch(err => {
-          console.log(err)
         })
       }).catch(() => {})
     },
@@ -131,7 +129,6 @@ export default {
           })
         }
       }).catch(err => {
-        console.log(err)
       })
     },
     updateType() {
@@ -154,7 +151,6 @@ export default {
           })
         }
       }).catch(err => {
-        console.log(err)
       })
     },
     // 数据初始化

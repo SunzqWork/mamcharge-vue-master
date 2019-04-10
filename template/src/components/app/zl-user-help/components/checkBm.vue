@@ -8,39 +8,46 @@
     <!-- 多选 -->
     <div
       v-if="dataList.children && check == 'checkbox' && types.includes(checkList.children[0].type)"
-      style="float: none;display: block;width: 100%;overflow:hidden;"
+      style="float: none;display: block;width: 100%;overflow:hidden;height: 26px;"
       v-for="(ins,index) in dataList.children"
       @change="changes(ins)"
       :key="ins.id"
     >
       <el-checkbox
         :indeterminate="dataList.children[index].isIndeterminate"
-        :label="`${ins.fullName}`"
+        :label="personnel || dataList.children[index].type == 'atom' ? `${ins.name}` : `${ins.name}(${ins.staffCount || 0}人)`"
         v-model="dataList.children[index].value"
       ></el-checkbox>
-      <div v-if="!dataList.children[index].value && dataList.children[index].type != 'atom'" @click="next(ins,index)" style="float: right;overflow: hidden;">
+      <div
+        v-if="!dataList.children[index].value && dataList.children[index].type != 'atom'"
+        @click="next(ins,index)"
+        style="float: right;overflow: hidden;"
+      >
         <svg-icon style="float: left;" icon-class="fenzhi" class="zl-org-icon"/>
       </div>
-      <div v-if="dataList.children[index].value && dataList.children[index].type != 'atom'" style="float: right;overflow: hidden;">
+      <div
+        v-if="dataList.children[index].value && dataList.children[index].type != 'atom'"
+        style="float: right;overflow: hidden;"
+      >
         <svg-icon style="float: left;color:red;" icon-class="org" class="zl-org-icon"/>
       </div>
     </div>
     <!-- 单选 -->
-
     <div
-      v-if="dataList.children && check == 'radio' && types.includes(checkList.children[0].type)"
+      v-if="dataList.children && check == 'radio' && types.includes(checkList.children[0].type) && checkList.children[0].type == 'atom'"
       style="float: none;display: block;width: 100%;overflow:hidden;"
       v-for="(ins,index) in dataList.children"
       :key="ins.id"
     >
-      <el-radio :label="ins.id" v-model="radio" @change="radioChange">{{ins.fullName}}</el-radio>
-      <div @click="next(ins,index)" style="float: right;overflow: hidden;">
+      <el-radio :label="ins.id" v-model="radio" @change="radioChange">{{ins.name}}</el-radio>
+      <div @click="next(ins,index)" style="float: right;overflow: hidden;" v-if="!dataList.children[index].value && dataList.children[index].type != 'atom'">
         <svg-icon style="float: left;" icon-class="fenzhi" class="zl-org-icon"/>
       </div>
     </div>
+
     <!-- 只点击 -->
     <div
-      v-if="dataList.children && types.includes(checkList.children[0].type) == false"
+      v-if="dataList.children && types.includes(checkList.children[0].type) == false || (check == 'radio' && dataList.children[0].type != 'atom')"
       style="float: none;display: block;width: 100%;overflow:hidden;cursor: pointer;"
       v-for="(ins,index) in dataList.children"
       :key="ins.id"
@@ -49,7 +56,9 @@
       <div style="float: left;overflow: hidden;margin-right: 10px;">
         <i class="el-icon-caret-right"></i>
       </div>
-      <p class="zl-msg">{{`${ins.fullName}`}}</p>
+      <p
+        class="zl-msg"
+      >{{personnel ? `${ins.name}` : `${ins.name}(${ins.staffCount || 0}人)`}}</p>
       <div style="float: right;overflow: hidden;">
         <svg-icon style="float: left;" icon-class="fenzhi" class="zl-org-icon"/>
       </div>
@@ -71,12 +80,16 @@ export default {
     check: {
       type: String,
       default: "checkbox"
+    },
+    personnel: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
     return {
       data: [],
-      radio:"",
+      radio: "",
       dataList: this.checkList,
       clicks: false
     };
@@ -96,7 +109,7 @@ export default {
     }
   },
   mounted() {
-       this.radio = this.checkList.radio 
+    this.radio = this.checkList.radio;
     // types
     if (this.checkList.children == "" || this.checkList.children == undefined) {
       // 最后一级
@@ -106,17 +119,13 @@ export default {
   },
   methods: {
     // 清空
-    cleanRadio(){
-      this.radio = ""
+    cleanRadio() {
+      this.radio = "";
     },
     // 单选触发
-    radioChange(){
-      this.checkList.radio = this.radio
-       this.$emit(
-        "check-tree",
-        this.radio
-      );
-
+    radioChange() {
+      this.checkList.radio = this.radio;
+      this.$emit("check-tree", this.radio);
     },
     //触发
     changes(info) {
@@ -134,7 +143,6 @@ export default {
         info,
         this.dataList.children.filter(s => s.value).length
       );
-      
     },
     // 查询所有
     next(s, index) {

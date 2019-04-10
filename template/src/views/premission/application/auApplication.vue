@@ -3,11 +3,11 @@
     <zl-card>
       <el-button class="btn-theme" @click="save" >
         <svg-icon icon-class="pre-save"></svg-icon>
-        保存
+        确定
       </el-button>
       <el-button class="btn-default" @click="$router.go(-1)">
         <svg-icon icon-class="pre-back"></svg-icon>
-        返回
+        取消
       </el-button>
     </zl-card>
     <zl-card isHeader icon="per-application" :title="$route.name === 'addApplication' ? '新增应用' : '编辑应用'">
@@ -93,7 +93,7 @@ export default {
             this.addForm.hidden = 0
           }
           // this.addForm.icon = this.$refs.icon.icon;
-          if (this.$route.query.id == '') { // 新增保存
+          if (this.$route.query.id == '') { // 新增确定
             addFunction(this.addForm).then(res => {
               if (res.errcode == 0) {
                 this.$message({
@@ -129,7 +129,7 @@ export default {
                 });
               }
             })
-          } else { // 修改保存
+          } else { // 修改确定
             editFunction(this.$route.query.id, this.addForm).then(res => {
               if (res.errcode == 0) {
                 this.$message({
@@ -167,7 +167,6 @@ export default {
             })
           }
         } else {
-          console.log('error submit!!');
           return false;
         }
       });
@@ -176,7 +175,6 @@ export default {
   mounted() {
     //新增还是编辑
     if (this.$route.query.id == '') {
-      console.log('新增');
     } else {
       searcchEdit(this.$route.query.id).then(res => {
         this.addForm = res.data;

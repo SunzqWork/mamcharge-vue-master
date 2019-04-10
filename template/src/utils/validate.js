@@ -67,3 +67,9 @@ export function passwordValidate(str) {
   const reg = /^(?![a-zA-z]+$)(?!\d+$)(?![!@#$%^&*]+$)(?![a-zA-z\d]+$)(?![a-zA-z!@#$%^&*]+$)(?![\d!@#$%^&*]+$)[a-zA-Z\d!@#$%^&*]+$/
   return reg.test(str)
 }
+
+// 验证是否有特殊字符
+export function specialStrValidate(str) {
+  const reg = /[`~!@#$%^&*_+<>{}\/'[\]]/im
+  return reg.test(str)
+}

@@ -1,15 +1,19 @@
 <template>
   <div id="organization2">
-    <zl-card class="left">
-      <zl-org-tree :isCount="false" :data="treeData" @handleNodeClick="handleNodeClick"></zl-org-tree>
+    <zl-card class="left" >
+      <el-scrollbar wrapClass="scrollbar-wrapper" class="scroll">
+        <zl-org-tree :isCount="true" :data="treeData" @handleNodeClick="handleNodeClick"></zl-org-tree>
+      </el-scrollbar>
     </zl-card>
     <div class="right">
-      <zl-card class="right-card">
+      <zl-card class="right-card" >
+        <div style="height: 460px;overflow:auto;">
         <el-scrollbar wrapClass="scrollbar-wrapper" class="scroll2">
           <ZB :info="ZBInfo" v-if="type === 1" @get-tree="getTreeFunc"></ZB>
-          <FB :info="FMInfo" v-if="type === 2" @get-tree="getTreeFunc"></FB>
-          <BM :info="BMInfo" v-if="type === 3" @get-tree="getTreeFunc"></BM>
+          <FB :info="FMInfo" v-if="type === 2" :hidden="isWhere" @get-tree="getTreeFunc"></FB>
+          <BM :info="BMInfo" v-if="type === 3" :hidden="isWhere" :has="has" @get-tree="getTreeFunc"></BM>
         </el-scrollbar>
+        </div>
       </zl-card>
     </div>
   </div>
@@ -27,7 +31,9 @@ export default {
       ZBInfo: {},
       FMInfo: {},
       BMInfo: {},
-      type: 1 // 默认是总部
+      type: 1, // 默认是总部
+      isWhere: true,
+      has:true
     }
   },
   methods: {
@@ -56,16 +62,34 @@ export default {
         // TODO
       }
     },
-    getTree() {
+    getTree(load) {
       this.$store.dispatch('GetOrgTree').then(data => {
-        if (data.code === 0) {
-          this.treeData = [data.data]
-          this.ZBInfo = this.treeData[0]
+        if (data.code === 0 && load === 'load') {
+          switch(parseInt(data.data.type)){
+            case 1:
+          this.ZBInfo = data.data
+          this.isWhere = true
+          this.has = true
+            break;
+            case 2:
+          this.FMInfo = data.data
+          this.isWhere = false
+          this.has = true
+            break;
+            case 3:
+          this.BMInfo = data.data
+          this.isWhere = false
+          this.has = false
+            break;
+          }
+          this.type = data.data.type
         } else {
-          this.$message({ type: 'warning', message: data.message })
+          if(data.code != 0){
+            this.$message({ type: 'warning', message: data.message })
+          }
         }
+        this.treeData = [data.data]
       }).catch(err => {
-        console.log(err)
       })
     },
     getTreeFunc() {
@@ -73,14 +97,18 @@ export default {
     },
     resize() {
       this.$nextTick(() => {
-        // document.getElementsByClassName('scroll')[0].style.height = (document.getElementsByClassName('left')[0].offsetHeight * 0.90) + 'px'
-        document.getElementsByClassName('scroll2')[0].style.height = (document.getElementsByClassName('right')[0].offsetHeight * 0.95) + 'px'
+        document.getElementsByClassName('scroll')[0].style.height = (document.getElementsByClassName('left')[0].offsetHeight - 10) + 'px'
       })
+    }
+  },
+  computed:{
+    tableHeight() {
+      return this.$store.state.app.$th
     }
   },
   mounted() {
     this.resize()
-    this.getTree()
+    this.getTree('load')
   }
 }
 </script>
@@ -100,12 +128,12 @@ export default {
     position: absolute;
     top: 0;
     bottom: 0;
-    .scroll{
-      padding-right: 5px;
-    }
+    // .scroll{
+    //   padding-right: 5px;
+    // }
   }
   .right{
-    margin-left: 300px;
+    margin-left: 310px;
     height: 100%;
     position: relative;
     .right-card{

@@ -1,5 +1,7 @@
 import request from '@/utils/request'
 
+// ost 开头的接口废弃
+
 // 获取代理商/商户
 export function getCommercialList() {
   return request({

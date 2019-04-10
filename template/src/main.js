@@ -13,28 +13,29 @@ import App from './App'
 import router from './router'
 import store from './store'
 
-import i18n from './lang' // Internationalization
-import './icons' // icon
-import './errorLog' // error log
-import './permission' // permission control
-import './mock' // simulation data
+import i18n from './lang'
+import './icons'
+import './errorLog'
+import './permission'
+import './mock'
 import Icon from 'vue-awesome/components/Icon'
 import 'vue-awesome/icons'
-import * as filters from './filters' // global filters
-
+import * as filters from './filters'
 import zlCard from './components/app/zl-card/index'
 import orgTree from './components/app/org-tree/index'
 import zlInfo from './components/app/zl-info/index.vue'
 import zlHelp from './components/app/zl-user-help/index.vue'
 import ChTreeTable from 'vue-table-with-tree-grid'
-
+import { btnPermission } from './utils/utils'
+import axios from 'axios'
 var moment = require('moment')
 var _ = require('lodash')
 window.moment = moment
 window._ = _
+Vue.prototype.$axios = axios
 Vue.component('icon', Icon)
 Vue.use(Element, {
-    size: Cookies.get('size') || 'medium', // set element-ui default size
+    size: Cookies.get('size') || 'medium',
     i18n: (key, value) => i18n.t(key, value)
 })
 
@@ -45,7 +46,8 @@ Vue.component('zl-info', zlInfo)
 Vue.component('zl-help', zlHelp)
 Vue.component("ChTreeTable", ChTreeTable)
 
-// register global utility filters.
+
+// 全局过滤器
 Object.keys(filters).forEach(key => {
     Vue.filter(key, filters[key])
 })
@@ -63,6 +65,12 @@ String.prototype.trim = function(char, type) {
 }
 
 Vue.config.productionTip = false
+
+Vue.prototype.btnPermission = btnPermission
+
+const $clientHeight = document.documentElement.clientHeight
+const $tableHight = $clientHeight - 334
+store.commit('SET_TABLEHEIGHT', $tableHight)
 
 new Vue({
     el: '#app',

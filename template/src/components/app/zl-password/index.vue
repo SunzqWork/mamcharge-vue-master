@@ -5,9 +5,13 @@
       v-model="model" 
       size="medium" 
       :type="type" 
+      class="zl-form-control zl-input-240px"
       @focus="hidePassword"
-      @input="handlInput" 
-      :maxlength="16">
+      @input="handlInput"
+      :minlength="4" 
+      >
+      <!-- :maxlength="50" -->
+
       <template slot="append">
         <i class="el-icon-view" @click="showPassword"></i>
       </template>
@@ -16,6 +20,8 @@
   </div>
 </template>
 <script>
+import { getSafetyData } from "@/api/safety"
+
 export default {
   name: 'zl-password',
   props: ['value'],
@@ -24,35 +30,79 @@ export default {
       model: this.value,
       type: 'password',
       status: '',
-      statusStyle: {}
+      statusStyle: {},
+      // pwdLength 密码长度
+      pawInfo:""
     }
   },
   methods: {
     showPassword() {
-      this.type = 'text'
+      if(this.type == 'text'){
+        this.type = 'password'
+      }else{
+        this.type = 'text'
+      }
     },
-    hidePassword() {
-      this.type = 'password'
-    },
+    // hidePassword() {
+      // this.type = 'password'
+    // },
     handlInput() {
-      const num = this.checkStrong(this.model)
-      if (num === 0 || num === 1 || num === 2) {
+      console.log(this.model,'this.modelthis.modelthis.model')
+      // switch(){
+      //   case 0:
+                
+      //           break;
+      //       case 1:
+                
+
+      //           if(!password.matches(regex)){
+      //               return Rez.error(2,String.format("密码应包含大小写字母及数字"));
+      //           }
+
+      //           break;
+      //       case 2:
+      //           if (password.length() < 8 ){
+      //               return Rez.error(1,String.format("密码长度应大于等于%d",8));
+      //           }
+      //           if(!password.matches(regex)){
+      //               return Rez.error(2,String.format("密码应包含大小写字母,数字及特殊字符"));
+      //           }
+      //           break;
+
+      // }
+      if(this.model.length < this.pawInfo.pwdLength){
         this.status = '弱'
         this.statusStyle = { color: '#F4A460' }
-      } else if (num === 3) {
-        this.status = '中'
-        this.statusStyle = { color: '#9B30FF' }
-      } else if (num === 4) {
-        this.status = '强'
-        this.statusStyle = { color: '#00EE76' }
-      } else {
-        this.status = '弱'
+      }else{
+        if(/(?=.*[0-9])(?=.*[A-Z].*)(?=.*[a-z])(?=.*[^a-zA-Z0-9])/.test(this.model)){
+              this.status = '强'
+              this.statusStyle = { color: '#00EE76' }
+          }else{
+            if (/^(?=.*[0-9].*)(?=.*[A-Z].*)(?=.*[a-z].*)/.test(this.model)){
+              this.status = '中'
+              this.statusStyle = { color: '#9B30FF' }
+            }else{
+                this.status = '弱'
+                this.statusStyle = { color: '#F4A460' }
+            }
+          }
       }
-      this.$emit('input', this.model)
+      const num = this.checkStrong(this.model)
+      // if (num === 0 || num === 1) {
+      //   this.status = '弱'
+      //   this.statusStyle = { color: '#F4A460' }
+      // } else if (num === 2) {
+      // } else if (num === 4 || num === 3) {
+      //   this.status = '强'
+      //   this.statusStyle = { color: '#00EE76' }
+      // } else {
+      //   this.status = '弱'
+      // }
+      this.$emit('input', this.model, num)
     },
     checkStrong(value) {
       let modees = 0
-      if (value.length < 6) { return modees }
+      if (value.length < 8) { return modees }
       if (/[0-9]/.test(value)) { modees++ }
       if (/[a-z]/.test(value)) { modees++ }
       if (/[A-Z]/.test(value)) { modees++ }
@@ -63,12 +113,17 @@ export default {
         case 2:
           return 2
         case 3:
-          return 3
+          return value.length < 12 ? 2 : 3
         case 4:
-          return value.length < 12 ? 3 : 4
+          return value.length < 12 ? 2 : 4
         break
       }
     }
+  },
+  mounted(){
+    getSafetyData().then( s => {
+        this.pawInfo = s.data.records[0]
+      })
   }
 }
 </script>

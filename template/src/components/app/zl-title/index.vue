@@ -21,9 +21,9 @@ export default {
     font-size: 14px;
     color: #666666;
     font-weight: 500;
-    padding: 10px 15px;
-    border-bottom: 1px solid #e5e5e5;
-    margin: 15px 0 25px 20px;
+    padding: 12px 15px;
+    // border-bottom: 1px solid #e5e5e5;
+    // margin: 15px 0 25px 20px;
     position: relative;
     width: 100%;
     font-weight: bold;

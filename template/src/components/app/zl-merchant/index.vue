@@ -60,7 +60,7 @@ export default {
       if (value === '' || value === null || value === undefined) {
         this.$message({
           type: 'warning',
-          message: '请输入要搜索的商户'
+          message: '请输入要查询的商户'
         })
         return false
       }
@@ -72,7 +72,6 @@ export default {
           this.merchantList = res.data
         }
       }).catch(err => {
-        console.log(err)
       })
     },
     getSortCommercial(value) {
@@ -81,7 +80,6 @@ export default {
           this.merchantList = res.data
         }
       }).catch(err => {
-        console.log(err)
       })
     },
     handlerCheck(value) {

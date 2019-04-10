@@ -1,3 +1,5 @@
+
+
 // set function parseTime,formatTime to filter
 export { parseTime, formatTime } from '@/utils'
 
@@ -39,4 +41,16 @@ export function numberFormatter(num, digits) {
 
 export function toThousandFilter(num) {
   return (+num || 0).toString().replace(/^-?\d+/g, m => m.replace(/(?=(?!\b)(\d{3})+$)/g, ','))
+}
+
+/**
+ * 数据过滤
+ * @param {*} str 
+ */
+export function showFilter(str) {
+  if (str === null || str === undefined || str === '') {
+    return '----'
+  } else {
+    return str
+  }
 }

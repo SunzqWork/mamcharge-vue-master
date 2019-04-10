@@ -1,11 +1,14 @@
 'use strict'
-const fs = require('fs')
 const path = require('path')
+const fs = require('fs')
 const utils = require('./utils')
 const config = require('../config')
 const { VueLoaderPlugin } = require('vue-loader')
 const vueLoaderConfig = require('./vue-loader.conf')
 
+function resolve(dir) {
+    return path.join(__dirname, '..', dir)
+}
 //打包前准备111
 function copyFolder(from, to) { // 复制文件夹到指定目录
 
@@ -30,11 +33,6 @@ function copyFolder(from, to) { // 复制文件夹到指定目录
     }
 }
 copyFolder('node_modules/mamcharge-vue-frame/template', '.')
-
-function resolve(dir) {
-    return path.join(__dirname, '..', dir)
-}
-
 const createLintingRule = () => ({
     test: /\.(js|vue)$/,
     loader: 'eslint-loader',
@@ -64,6 +62,7 @@ module.exports = {
         }
     },
     module: {
+        unknownContextCritical: false,
         rules: [
             // ...(config.dev.useEslint ? [createLintingRule()] : []),
             {

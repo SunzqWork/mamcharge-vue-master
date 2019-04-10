@@ -4,7 +4,13 @@
 import { getAreaList, getLatitude } from '@/api/vendor'
 import { orgTree, getOrgInfo, getSubOrgList, getSubDeptList, addOrgs, editOrgs } from '@/api/premission'
 const vendor = {
-  state: {},
+  state: {
+    photoUpload: `${process.env.PERMISSION_API}/data/upload`,
+    userUpload:`${process.env.PERMISSION_API}/data/users/import/data`,
+    temFile:`${process.env.PERMISSION_API}/api/downloadExcel`,
+	  exportFile:`${process.env.PERMISSION_API}/data/users/export`,
+    failFile:`${process.env.PERMISSION_API}/data/users/export/failList`
+  },
   mutations: {},
   actions: {
     // 获取大区
@@ -19,7 +25,6 @@ const vendor = {
           }
         }).catch(err => {
           reject(err)
-          console.log(err)
         })
       })
     },
@@ -33,7 +38,6 @@ const vendor = {
             resove(false)
           }
         }).catch(err => {
-          console.log(err)
         })
       })
     },
@@ -54,7 +58,6 @@ const vendor = {
           }
         }).catch(err => {
           reject(err)
-          console.log(err)
         })
       })
     },
@@ -75,7 +78,6 @@ const vendor = {
           }
         }).catch(err => {
           reject(err)
-          console.log(err)
         })
       })
     },
@@ -97,7 +99,6 @@ const vendor = {
           }
         }).catch(err => {
           reject(err)
-          console.log(err)
         })
       })
     },
@@ -118,11 +119,10 @@ const vendor = {
             })
           }
         }).catch(err => {
-          console.log(err)
         })
       })
     },
-    // 新建组织
+    // 新增组织
     AddOrgs({ commit }, data) {
       return new Promise((resolve, reject) => {
         addOrgs(data).then(response => {
@@ -139,7 +139,6 @@ const vendor = {
             })
           }
         }).catch(err => {
-          console.log(err)
         })
       })
     },
@@ -161,7 +160,6 @@ const vendor = {
           }
         }).catch(err => {
           reject(err)
-          console.log(err)
         })
       })
     }

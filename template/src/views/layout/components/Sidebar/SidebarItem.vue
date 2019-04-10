@@ -9,7 +9,7 @@
       </app-link>
     </template>
 
-    <el-submenu v-else ref="submenu" :index="resolvePath(item.path)">
+    <el-submenu  v-else ref="submenu" :index="resolvePath(item.path)">
       <template slot="title">
         <item v-if="item.meta" :icon="item.meta.icon" :title="generateTitle(item.meta.title)" />
       </template>
@@ -22,7 +22,6 @@
           :key="child.path"
           :base-path="resolvePath(child.path)"
           class="nest-menu" />
-
         <app-link v-else :to="resolvePath(child.path)" :key="child.name">
           <el-menu-item :index="resolvePath(child.path)">
             <item v-if="child.meta" :icon="child.meta.icon" :title="generateTitle(child.meta.title)" />
@@ -103,3 +102,22 @@ export default {
   }
 }
 </script>
+<style lang="scss">
+  .menu-wrapper{
+    li:hover{
+        background:rgba(36, 148, 224, 0.8) !important;
+    }
+     .el-submenu__title:hover{
+        background:rgba(36, 148, 224, 0.8) !important;
+     }
+    .el-submenu{
+      .el-menu-item:hover {
+        background:rgba(36, 148, 224, 0.8) !important;
+      }
+      .is-active{
+        background:rgba(36, 148, 224, 1) !important;
+      }
+    } 
+  } 
+
+</style>

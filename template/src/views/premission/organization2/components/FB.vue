@@ -2,39 +2,56 @@
   <div id="fb">
     <el-tabs type="border-card">
       <el-tab-pane label="分部信息">
-        <el-row class="mb10">
-          <el-button class="btn-theme" icon="el-icon-plus" @click="addFB">新建分部</el-button>
-          <el-button class="btn-default" icon="el-icon-edit" @click="editFB">编辑分部</el-button>
+        <el-row class="mb10" style="overflow:hidden;">
+          <el-button class="btn-theme" style="float:left;" @click="addFB" v-if="hidden">新增同级分部</el-button>
+          <el-button class="btn-default" style="float:left;margin-left: 10px;" @click="editFB">编辑分部</el-button>
           <el-button
             class="btn-default"
-            icon="el-icon-warning"
             @click="stopFB(fbInfo)"
+            style="float:left;margin-left: 10px;"
           >{{ fbInfo.status === 1 ? '停用' : '启用'}}</el-button>
         </el-row>
         <zl-card isHeader icon="subsidiary" title="基本信息" style="margin: 0;">
+          <!-- {{fbInfo}} -->
           <zl-info label="简称" :info="fbInfo.name"></zl-info>
           <zl-info label="全称" :info="fbInfo.fullName"></zl-info>
-          <zl-info label="上级分部" :info="fbInfo.parent.name"></zl-info>
+          <zl-info label="上级分部" :info="parentName"></zl-info>
           <zl-info label="显示顺序" :info="fbInfo.seq"></zl-info>
           <zl-info label="分部编号" :info="fbInfo.code"></zl-info>
           <zl-info label="限制用户数" :info="fbInfo.staffLimit"></zl-info>
         </zl-card>
       </el-tab-pane>
       <el-tab-pane label="下级分部">
-        <el-row class="mb10">
-          <el-button class="btn-theme" icon="el-icon-plus" @click="addFB">新建同级分部</el-button>
-          <el-button class="btn-theme" icon="el-icon-plus" @click="addSubFB">新建下级分部</el-button>
-          <el-button class="btn-default" icon="el-icon-delete" @click="deleteAllOrgs">批量删除</el-button>
+        <el-row class="mb10" style="overflow:hidden;">
+          <!-- <el-button class="btn-theme"  @click="addFB">新增同级分部</el-button> -->
+          <el-button class="btn-theme" style="float:left;" @click="addSubFB">新增分部</el-button>
+          <el-button class="btn-default" style="float:left;margin-left: 10px;" @click="new_edit(false, '编辑下级分部')">编辑</el-button>
+          <!-- <el-button class="btn-default" style="float:left;margin-left: 10px;" @click="new_edit(true, '查看下级分部')">查看</el-button> -->
+          <el-button class="btn-default" style="float:left;margin-left: 10px;" @click="deleteAllOrgs('分部')">删除</el-button>
         </el-row>
-        <el-table :data="subFBTableData" class="zl-table" @selection-change="selectIds" stripe>
-          <el-table-column
+        <el-table 
+          :data="subFBTableData" 
+          class="zl-table" 
+          highlight-current-row 
+          @current-change="clickRow"  
+          stripe 
+          border>
+          <!-- <el-table 
+          :data="subFBTableData" 
+          class="zl-table" 
+          @selection-change="selectIds"
+          highlight-current-row 
+          @current-change="clickRow"  
+          stripe 
+          border> -->
+          <!-- <el-table-column
             :selectable="checkSelection"
             type="selection"
             width="55"
-            align="left"
-            header-align="left"
-          ></el-table-column>
-          <el-table-column label="分部简称" prop="name" align="left" header-align="left">
+            align="center"
+            header-align="center"
+          ></el-table-column> -->
+          <el-table-column label="分部简称" prop="name" align="left" header-align="center" :show-overflow-tooltip="true">
             <template slot-scope="scope">
               <div>
                 {{ scope.row.name }}
@@ -42,20 +59,21 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="分部全称" prop="fullName" align="left" header-align="left"></el-table-column>
-          <el-table-column label="分部编号" prop="code" align="left" header-align="left"></el-table-column>
-          <el-table-column label="显示顺序" prop="seq" align="left" header-align="left"></el-table-column>
-          <el-table-column label="操作" prop align="left" header-align="left">
+          <el-table-column label="分部全称" prop="fullName" align="left" header-align="center" :show-overflow-tooltip="true"></el-table-column>
+          <el-table-column label="分部编号" prop="code" align="left" header-align="center" :show-overflow-tooltip="true"></el-table-column>
+          <el-table-column label="显示顺序" prop="seq" align="right" header-align="center"></el-table-column>
+          <el-table-column label="操作" prop align="center" header-align="center">
             <template slot-scope="scope">
-              <span class="icon-theme" @click="editSubFB(scope.row)">编辑</span>
-              <i class="zl-icon-line"></i>
-              <span class="icon-theme" @click="stopFunc(scope.row)">{{ scope.row.status === 1 ? '停用' : '启用'}}</span>
+              <!-- <span class="icon-theme" @click="editSubFB(scope.row)">编辑</span>
+              <i class="zl-icon-line"></i> -->
+              <span class="icon-theme" @click="stopFunc(scope.row,1)">{{ scope.row.status === 1 ? '停用' : '启用'}}</span>
             </template>
           </el-table-column>
         </el-table>
         <el-pagination
           background
           class="zl-pagination"
+          style="margin-bottom: 2px;"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           :current-page="currentPage"
@@ -67,18 +85,34 @@
       </el-tab-pane>
       <el-tab-pane label="下级部门">
 
-        <el-row class="mb10">
-          <el-button class="btn-theme" icon="el-icon-plus" @click="addBM">新建部门</el-button>
-          <el-button class="btn-default" icon="el-icon-delete" @click="deleteAllOrgs">批量删除</el-button>
+        <el-row class="mb10" style="overflow:hidden;">
+          <el-button class="btn-theme" style="float:left;" @click="addBM">新增部门</el-button>
+          <el-button class="btn-default" style="float:left;margin-left:10px;" @click="edit(false, '编辑下级部门')">编辑</el-button>
+           <!-- <el-button class="btn-default" style="float:left;margin-left:10px;" @click="edit(true, '查看下级部门')">查看</el-button> -->
+          <el-button class="btn-default" style="float:left;margin-left:10px;" @click="deleteAllOrgs('部门')">删除</el-button>
         </el-row>
-        <el-table :data="bmTableData" class="zl-table" @selection-change="selectIds2" stripe>
-          <el-table-column
+        <el-table 
+          :data="bmTableData" 
+          class="zl-table" 
+          highlight-current-row 
+          @current-change="clickRowMB"
+          stripe 
+          border>
+          <!-- <el-table 
+          :data="bmTableData" 
+          class="zl-table" 
+          @selection-change="selectIds2" 
+          highlight-current-row 
+          @current-change="clickRowMB"
+          stripe 
+          border> -->
+          <!-- <el-table-column
             :selectable="checkSelection"
             type="selection"
-            align="left"
-            header-align="left"
-          ></el-table-column>
-          <el-table-column label="部门简称" prop="name" align="left" header-align="left">
+            align="center"
+            header-align="center"
+          ></el-table-column> -->
+          <el-table-column label="部门简称" prop="name" align="left" header-align="center" :show-overflow-tooltip="true">
             <template slot-scope="scope">
               <div>
                 {{ scope.row.name }}
@@ -86,14 +120,14 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="部门全称" prop="fullName" align="left" header-align="left"></el-table-column>
-          <el-table-column label="部门编号" prop="code" align="left" header-align="left"></el-table-column>
-          <el-table-column label="当前用户数" prop="staffLimit" align="left" header-align="left"></el-table-column>
-          <el-table-column label="显示顺序" prop="seq" align="left" header-align="left"></el-table-column>
-          <el-table-column label="操作" prop align="left" header-align="left">
+          <el-table-column label="部门全称" prop="fullName" align="left" header-align="center" :show-overflow-tooltip="true"></el-table-column>
+          <el-table-column label="部门编号" prop="code" align="left" header-align="center" :show-overflow-tooltip="true"></el-table-column>
+          <el-table-column label="当前用户数" prop="staffCount" align="right" header-align="center" :show-overflow-tooltip="true"></el-table-column>
+          <el-table-column label="显示顺序" prop="seq" align="right" header-align="center" :show-overflow-tooltip="true"></el-table-column>
+          <el-table-column label="操作" prop align="center" header-align="center">
             <template slot-scope="scope">
-              <span class="icon-theme" @click="subBMEdit(scope.row)">编辑</span>
-              <i class="zl-icon-line"></i>
+              <!-- <span class="icon-theme" @click="subBMEdit(scope.row)">编辑</span>
+              <i class="zl-icon-line"></i> -->
               <span class="icon-theme" @click="stopFunc(scope.row)">{{ scope.row.status === 1 ? '停用' : '启用'}}</span>
             </template>
           </el-table-column>
@@ -101,6 +135,7 @@
         <el-pagination
           background
           class="zl-pagination"
+          style="margin-bottom: 2px;"
           @size-change="handleSizeChangeBM"
           @current-change="handleCurrentChangeBM"
           :current-page="currentPageBM"
@@ -111,61 +146,64 @@
         ></el-pagination>
       </el-tab-pane>
     </el-tabs>
-    <!-- 新建分部 -->
+    <!-- 新增分部 -->
     <FB-dialog
-      title="新建分部"
+      title="新增分部"
       :isShow.sync="fbVisible"
       v-if="fbVisible"
-      width="450px"
+      width="850px"
       @is-submit="isSubmit"
-      :parentName="fbInfo.parent.name"
+      :parentName="parentName"
     ></FB-dialog>
     <!-- 编辑分部 -->
     <FB-dialog
       title="编辑分部"
       :isShow.sync="fbVisibleEdit"
       v-if="fbVisibleEdit"
-      :parentName="fbInfo.parent.name"
+      :parentName="parentName"
       :data="JSON.parse(JSON.stringify(fbInfo))"
-      width="450px"
+      width="850px"
+      :isDisabled="isDisabled"
       @is-submit="isSubmitEdit"
     ></FB-dialog>
-    <!-- 新建下级分部 -->
+    <!-- 新增分部 -->
     <FB-dialog
-      title="新建下级分部"
+      title="新增分部"
       :isShow.sync="fbVisibleSub"
       v-if="fbVisibleSub"
-      width="450px"
+      width="850px"
       @is-submit="isSubmitSub"
       :parentName="fbInfo.name"
     ></FB-dialog>
-    <!-- 新建部门 -->
+    <!-- 新增部门 -->
     <BM-dialog
-      title="新建部门"
+      title="新增部门"
       :isShow.sync="bmVisible"
       v-if="bmVisible"
       :parentName="fbInfo.name"
-      width="450px"
+      width="850px"
       @is-submit="isSubmitBM"
     ></BM-dialog>
     <!-- 编辑下级部门 -->
     <BM-dialog
-      title="编辑下级部门"
+      :title="bmTitle"
       :isShow.sync="subBmVisible"
       v-if="subBmVisible"
       :parentName="fbInfo.name"
-      width="450px"
+      width="850px"
       @is-submit="isSubmitBMEdit"
+      :isDisabled="isDisabled"
       :data="JSON.parse(JSON.stringify(subBMInfo))"
     ></BM-dialog>
     <!-- 编辑下级分部 -->
     <FB-dialog
-      title="编辑下级分部"
+      :title="fbTitle"
       :isShow.sync="editSubFBVisible"
       v-if="editSubFBVisible"
       :parentName="fbInfo.name"
-      width="450px"
+      width="850px"
       :data="JSON.parse(JSON.stringify(subFBInfo))"
+      :isDisabled="isDisabled"
       @is-submit="isSubmitSubEdit"
     ></FB-dialog>
   </div>
@@ -181,6 +219,10 @@ export default {
     info: {
       type: Object,
       default: () => {}
+    },
+    hidden: {
+      type:Boolean,
+      default: false
     }
   },
   data() {
@@ -203,27 +245,82 @@ export default {
       subFBInfo: {},
       subBMInfo: {},
       subBmVisible: false,
-      ids: []
+      ids: [],
+      isDisabled: false,
+      fbTitle: '编辑下级分部',
+      bmTitle: '编辑下级部门'
     };
   },
   watch: {
     info() {
       this.fbInfo = this.info;
+      if(!this.info.parent){
+        this.parentName = this.info.fullName
+      }else{
+        this.parentName = this.info.parent.name
+      }
       this.GetSubOrgList();
       this.GetSubDeptList();
     }
   },
   methods: {
+    clickRow(row) {
+      this.ids = [row.id]
+      this.subFBInfo = row
+    },
+    new_edit(flag, title) {
+      this.isDisabled = flag
+      if (!this.subFBInfo.id) {
+        if (flag) {
+          this.$message({
+            type: 'warning',
+            message: '请选择要查看的数据'
+          })
+        } else {
+          this.$message({
+            type: 'warning',
+            message: '请选择要编辑的数据'
+          })
+        }
+      } else {
+        this.editSubFB(JSON.parse(JSON.stringify(this.subFBInfo)), title)
+      }
+    },
+
+    clickRowMB(row) {
+      this.ids = [row.id]
+      this.subBMInfo = row
+    },
+
+    edit(flag, title) {
+      this.isDisabled = flag
+      if (!this.subBMInfo.id) {
+        if (flag) {
+          this.$message({
+            type: 'warning',
+            message: '请选择要查看的数据'
+          })
+        } else {
+          this.$message({
+            type: 'warning',
+            message: '请选择要编辑的数据'
+          })
+        }
+      } else {
+        this.subBMEdit(JSON.parse(JSON.stringify(this.subBMInfo)), title)
+      }
+    },
     // 根据id获取组织信息
     getOrgInfo() {
       this.$store.dispatch('GetOrgInfo', this.fbInfo.id).then(res => {
         if (res.code === 0) {
           this.fbInfo = res.data.info
+          this.parentName = res.data.info.parent.name
+          
         } else {
           this.$message.error(res.message)
         }
       }).catch(err => {
-        console.log(err)
       })
     },
     // 停用分部
@@ -255,7 +352,7 @@ export default {
             .dispatch("EditOrgs", row)
             .then(res => {
               if (res.code === 0) {
-                this.$message.success(`${str}成功`);
+                this.$message.success(`该部门${str}成功`);
                 this.getOrgInfo();
               } else {
                 this.$message.error(res.message);
@@ -263,7 +360,6 @@ export default {
                 this.$emit("get-tree");
             })
             .catch(err => {
-              console.log(err);
             });
         })
         .catch(() => {
@@ -293,7 +389,7 @@ export default {
       this.GetSubDeptList();
     },
     // 停用
-    stopFunc(obj) {
+    stopFunc(obj,ins) {
       const row = JSON.parse(JSON.stringify(obj));
       let str = "";
       if (row.status === 1) {
@@ -320,7 +416,7 @@ export default {
             .dispatch("EditOrgs", row)
             .then(res => {
               if (res.code === 0) {
-                this.$message.success(`${str}成功`);
+                this.$message.success(`${ins == 1 ? '该分部' : '该部门'}${str}成功`);
                 if (row.type === 3) {
                   this.GetSubDeptList();
                 } else {
@@ -332,7 +428,6 @@ export default {
           this.$emit("get-tree");
             })
             .catch(err => {
-              console.log(err);
             });
         })
         .catch(() => {
@@ -342,8 +437,9 @@ export default {
           });
         });
     },
-    editSubFB(obj) {
+    editSubFB(obj, title) {
       this.editSubFBVisible = true;
+      this.fbTitle = title
       this.subFBInfo = obj;
     },
     selectIds(selection, row) {
@@ -354,12 +450,12 @@ export default {
       this.ids = [];
       this.ids = selection.map(item => item.id);
     },
-    // 批量删除
-    deleteAllOrgs() {
+    // 删除
+    deleteAllOrgs(tip) {
       if (this.ids.length === 0) {
         this.$message({
           type: "warning",
-          message: "请选择要删除的数据"
+          message: `请选择要删除的${tip}`
         });
         return false;
       }
@@ -380,14 +476,14 @@ export default {
               if (res.success) {
                 this.$message.success("删除成功");
                 this.GetSubOrgList();
+                this.ids = []
                 this.GetSubDeptList();
                 this.$emit("get-tree");
               } else {
-                this.$message.error("删除失败，请联系管理员。");
+                this.$message.error(res.message)
               }
             })
             .catch(err => {
-              console.log(err);
             });
         })
         .catch(() => {
@@ -405,13 +501,13 @@ export default {
           if (response.code === 0) {
             this.$message.success("下级分部编辑成功");
             this.GetSubOrgList();
+            this.editSubFBVisible = false
             this.$emit("get-tree");
           } else {
-            this.$message.error("下级分部编辑失败，请联系管理员。");
+            this.$message.error(res.message)
           }
         })
         .catch(err => {
-          console.log(err);
         });
     },
     addBM() {
@@ -425,7 +521,7 @@ export default {
         .dispatch("AddOrgs", data)
         .then(res => {
           if (res.code === 0) {
-            this.$message.success("部门新建成功");
+            this.$message.success("部门新增成功");
             this.bmVisible = false;
             this.GetSubDeptList();
             this.$emit("get-tree");
@@ -434,13 +530,12 @@ export default {
           }
         })
         .catch(err => {
-          console.log(err);
         });
     },
     // 编辑部门
-    subBMEdit(obj) {
-      console.log(obj);
+    subBMEdit(obj, title) {
       this.subBmVisible = true;
+      this.bmTitle = title
       this.subBMInfo = obj;
     },
     isSubmitBMEdit(data) {
@@ -450,13 +545,13 @@ export default {
           if (response.code === 0) {
             this.$message.success("下级部门编辑成功");
             this.GetSubDeptList();
+            this.subBmVisible = false
             this.$emit("get-tree");
           } else {
-            this.$message.error("下级部门编辑失败，请联系管理员。");
+            this.$message.error(res.message)
           }
         })
         .catch(err => {
-          console.log(err);
         });
     },
     addFB() {
@@ -471,15 +566,15 @@ export default {
         .dispatch("AddOrgs", data)
         .then(res => {
           if (res.code === 0) {
-            this.$message.success("分部新建成功");
+            this.$message.success("分部新增成功");
             this.fbVisible = false;
+            this.fbVisibleSub = false;
             this.$emit("get-tree");
           } else {
             this.$message.error(res.message);
           }
         })
         .catch(err => {
-          console.log(err);
         });
     },
     editFB() {
@@ -494,28 +589,30 @@ export default {
           if (response.code === 0) {
             this.$message.success("分部编辑成功");
             this.getOrgInfo()
+            this.fbVisibleEdit = false
             this.$emit("get-tree");
           } else {
-            this.$message.error("分部编辑失败，请联系管理员。");
+            this.$message.error(response.message)
           }
         })
         .catch(err => {
-          console.log(err);
         });
     },
     addSubFB() {
       this.fbVisibleSub = true;
     },
-    // 新建下级分部
+    // 新增分部
     isSubmitSub(data) {
       data.pid = this.info.id;
       data.type = 2;
       this.$store
         .dispatch("AddOrgs", data)
         .then(res => {
+          console.log(res,'300300')
           if (res.code === 0) {
-            this.$message.success("下级分部新建成功");
+            this.$message.success("下级分部新增成功");
             this.fbVisible = false;
+            this.fbVisibleSub = false;
             this.GetSubOrgList();
             this.$emit("get-tree");
           } else {
@@ -523,7 +620,6 @@ export default {
           }
         })
         .catch(err => {
-          console.log(err);
         });
     },
     // 获取下级分部
@@ -540,7 +636,6 @@ export default {
           }
         })
         .catch(err => {
-          console.log(err);
         });
     },
 
@@ -558,11 +653,16 @@ export default {
           }
         })
         .catch(err => {
-          console.log(err);
         });
     }
   },
   mounted() {
+    this.fbInfo = this.info;
+      if(!this.info.parent){
+        this.parentName = this.info.fullName
+      }else{
+        this.parentName = this.info.parent.name
+      }
     this.GetSubOrgList();
     this.GetSubDeptList();
   }
